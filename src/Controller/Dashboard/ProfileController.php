@@ -17,7 +17,7 @@ class ProfileController extends AbstractController
     }
 
     /**
-     * @Route("/dashdoard/subscription", name="app_dashboard_subscription")
+     * @Route("/dashboard/subscription", name="app_dashboard_subscription")
      */
     public function subscription(): Response
     {

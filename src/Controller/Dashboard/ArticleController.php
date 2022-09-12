@@ -13,7 +13,7 @@ class ArticleController extends AbstractController
      */
     public function create(): Response
     {
-        return new Response("stub");
+        return $this->render('dashboard/article/create.html.twig');
     }
 
     /**
@@ -21,7 +21,7 @@ class ArticleController extends AbstractController
      */
     public function history(): Response
     {
-        return new Response("stub");
+        return $this->render('dashboard/article/history.html.twig');
     }
 
     /**
@@ -29,6 +29,6 @@ class ArticleController extends AbstractController
      */
     public function show(): Response
     {
-        return new Response("stub");
+        return $this->render('dashboard/article/show.html.twig');
     }
 }
