@@ -13,7 +13,7 @@ class ProfileController extends AbstractController
      */
     public function dashboard(): Response
     {
-        return new Response("stub");
+        return $this->render('dashboard/profile/dashboard.html.twig');
     }
 
     /**
@@ -21,7 +21,7 @@ class ProfileController extends AbstractController
      */
     public function subscription(): Response
     {
-        return new Response("stub");
+        return $this->render('dashboard/profile/subscription.html.twig');
     }
 
     /**
@@ -29,7 +29,7 @@ class ProfileController extends AbstractController
      */
     public function profile(): Response
     {
-        return new Response("stub");
+        return $this->render('dashboard/profile/profile.html.twig');
     }
 
     /**
@@ -37,6 +37,6 @@ class ProfileController extends AbstractController
      */
     public function modules(): Response
     {
-        return new Response("stub");
+        return $this->render('dashboard/profile/modules.html.twig');
     }
 }

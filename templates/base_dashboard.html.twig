@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/dashboard.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <div class="d-flex" id="wrapper">
+        <div class="bg-light border-right" id="sidebar-wrapper">
+            <div class="sidebar-heading">BlaBlaArticle</div>
+            <div class="list-group list-group-flush">
+                {% include 'partial/dashboard_sidebar_link.html.twig' with { route: 'app_dashboard', title: 'Рабочий стол' } %}
+                {% include 'partial/dashboard_sidebar_link.html.twig' with { route: 'app_dashboard_article_create', title: 'Создать статью' } %}
+                {% include 'partial/dashboard_sidebar_link.html.twig' with { route: 'app_dashboard_history', title: 'История статей' } %}
+                {% include 'partial/dashboard_sidebar_link.html.twig' with { route: 'app_dashboard_subscription', title: 'Подписка' } %}
+                {% include 'partial/dashboard_sidebar_link.html.twig' with { route: 'app_dashboard_profile', title: 'Профиль' } %}
+                {% include 'partial/dashboard_sidebar_link.html.twig' with { route: 'app_dashboard_modules', title: 'Модули генератора' } %}
+            </div>
+        </div>
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                <button class="btn btn-primary" id="menu-toggle">Скрыть меню</button>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Показать/Скрыть навигацию">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="#">Выйти</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+            <div class="container-fluid">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
