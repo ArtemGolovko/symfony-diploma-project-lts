@@ -1,5 +1,7 @@
 {% extends 'base_security.html.twig' %}
 
+{% form_theme form 'form/register_layout.html.twig' %}
+
 {% block title %}Регистрация на BlaBlaArticle{% endblock %}
 
 {% block content %}
@@ -7,7 +9,7 @@
     <div class="alert alert-success" role="alert">
         Для завершения регистрации подтвердите ваш email
     </div>
-    {{ form_start(form) }}
+    {{ form_start(form, { attr: { class: 'form-signin'} }) }}
         {{ form_row(form.name, {
             label: 'Ваше имя',
             attr: {
