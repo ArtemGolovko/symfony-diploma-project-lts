@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Form\Model\RegistrationFormModel;
+use App\Form\TypeExtension\RepeatedPasswordExtension;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -16,7 +17,7 @@ class RegistrationFormType extends AbstractType
         $builder
             ->add('name', TextType::class)
             ->add('email', EmailType::class)
-            ->add('plainPassword', RepeatedPasswordType::class)
+            ->add('plainPassword', RepeatedPasswordExtension::class)
         ;
     }
 
