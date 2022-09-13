@@ -1,0 +1,50 @@
+{% extends 'base_security.html.twig' %}
+
+{% form_theme form 'form/register_layout.html.twig' %}
+
+{% block title %}Регистрация на BlaBlaArticle{% endblock %}
+
+{% block content %}
+    <h5 class="card-title text-center">Регистрация</h5>
+    <div class="alert alert-success" role="alert">
+        Для завершения регистрации подтвердите ваш email
+    </div>
+    {{ form_start(form, { attr: { class: 'form-signin'} }) }}
+        {{ form_row(form.name, {
+            label: 'Ваше имя',
+            attr: {
+                placeholder: 'Ваше имя',
+                autofocus: true
+            },
+            required: true
+        }) }}
+
+        {{ form_row(form.email, {
+            label: 'Ваш Email',
+            attr: {
+                placeholder: 'Ваш Email'
+            },
+            required: true
+        }) }}
+
+        {{ form_row(form.plainPassword.password, {
+            label: 'Пароль',
+            attr: {
+                placeholder: 'Пароль'
+            },
+            required: true
+        }) }}
+
+        {{ form_row(form.plainPassword.confirmPassword, {
+            label: 'Подтверждение пароля',
+            attr: {
+                placeholder: 'Подтверждение пароля'
+            },
+            required: true
+        }) }}
+
+        <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Регистрация</button>
+        <hr class="my-4">
+        <div class="text-center"><a href="{{ path('app_login') }}">Я уже зарегистрирован</a></div>
+    {{ form_end(form) }}
+{% endblock %}

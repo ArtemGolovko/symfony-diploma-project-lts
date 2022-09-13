@@ -13,7 +13,7 @@
         <link href="{{ asset('css/app.min.css') }}" rel="stylesheet">
     {% endblock %}
 </head>
-<body>
+<body {% block body_attrs %}{% endblock %}>
 {% block body %}{% endblock %}
 {% block javascripts %}
     <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
