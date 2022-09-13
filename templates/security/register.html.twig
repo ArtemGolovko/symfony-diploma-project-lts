@@ -7,28 +7,44 @@
     <div class="alert alert-success" role="alert">
         Для завершения регистрации подтвердите ваш email
     </div>
-    <form class="form-signin">
-        <div class="form-label-group">
-            <input type="text" id="inputName" class="form-control" placeholder="Ваше имя" required autofocus>
-            <label for="inputName">Ваше имя</label>
-        </div>
-        <div class="form-label-group">
-            <input type="email" id="inputEmail" class="form-control" placeholder="Ваш Email" required>
-            <label for="inputEmail">Ваш Email</label>
-        </div>
+    {{ form_start(form) }}
+        {{ form_row(form.name, {
+            label: 'Ваше имя',
+            attr: {
+                placeholder: 'Ваше имя',
+                autofocus: true
+            },
+            required: true
+        }) }}
 
-        <div class="form-label-group">
-            <input type="password" id="inputPassword" class="form-control" placeholder="Пароль" required>
-            <label for="inputPassword">Пароль</label>
-        </div>
+        {{ form_row(form.email, {
+            label: 'Ваш Email',
+            attr: {
+                placeholder: 'Ваш Email'
+            },
+            required: true
+        }) }}
 
-        <div class="form-label-group">
-            <input type="password" id="inputConfirmPassword" class="form-control" placeholder="Подтверждение пароля" required>
-            <label for="inputConfirmPassword">Подтверждение пароля</label>
-        </div>
+        {{ form_row(form.plainPassword, {
+            first_options: {
+                label: 'Пароль',
+                attr: {
+                    placeholder: 'Пароль'
+                },
+                required: true
+            },
+            second_options: {
+                label: 'Подтверждение пароля',
+                attr: {
+                    placeholder: 'Подтверждение пароля'
+                },
+                required: true
+            },
+            required: true
+        }) }}
 
         <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Регистрация</button>
         <hr class="my-4">
         <div class="text-center"><a href="{{ path('app_login') }}">Я уже зарегистрирован</a></div>
-    </form>
+    {{ form_end(form) }}
 {% endblock %}
