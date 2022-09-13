@@ -8,5 +8,5 @@ class RegistrationFormModel
 
     public string $email;
 
-    public string  $plainPassword;
+    public string $plainPassword;
 }

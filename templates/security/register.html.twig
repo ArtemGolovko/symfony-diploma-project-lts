@@ -25,20 +25,18 @@
             required: true
         }) }}
 
-        {{ form_row(form.plainPassword, {
-            first_options: {
-                label: 'Пароль',
-                attr: {
-                    placeholder: 'Пароль'
-                },
-                required: true
+        {{ form_row(form.plainPassword.password, {
+            label: 'Пароль',
+            attr: {
+                placeholder: 'Пароль'
             },
-            second_options: {
-                label: 'Подтверждение пароля',
-                attr: {
-                    placeholder: 'Подтверждение пароля'
-                },
-                required: true
+            required: true
+        }) }}
+
+        {{ form_row(form.plainPassword.confirmPassword, {
+            label: 'Подтверждение пароля',
+            attr: {
+                placeholder: 'Подтверждение пароля'
             },
             required: true
         }) }}
