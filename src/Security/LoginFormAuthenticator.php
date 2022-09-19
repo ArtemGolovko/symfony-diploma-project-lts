@@ -60,9 +60,16 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
             'csrf_token' => $request->request->get('_csrf_token')
         ];
 
-        $request->getSession()->set(
+        $session = $request->getSession();
+
+        $session->set(
             Security::LAST_USERNAME,
             $credentials['email']
+        );
+
+        $session->set(
+            'remember_me',
+            $request->request->getBoolean('_remember_me')
         );
 
         return $credentials;
@@ -85,8 +92,12 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        $path = $this->getTargetPath($request->getSession(), 'main')
+        $session = $request->getSession();
+        $session->remove('remember_me');
+
+        $path = $this->getTargetPath($session, 'main')
             ?? $this->urlGenerator->generate('app_dashboard');
+
         return new RedirectResponse($path);
     }
 }

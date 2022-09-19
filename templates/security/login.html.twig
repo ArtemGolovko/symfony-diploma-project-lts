@@ -22,7 +22,7 @@
         </div>
 
         <div class="custom-control custom-checkbox mb-3">
-            <input name="_remember_me" type="checkbox" class="custom-control-input" id="customCheck1">
+            <input name="_remember_me" type="checkbox" class="custom-control-input" id="customCheck1" {% if app.session.get('remember_me', false) %}checked{% endif %}>
             <label class="custom-control-label" for="customCheck1">Запомнить меня</label>
         </div>
         <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Войти</button>
