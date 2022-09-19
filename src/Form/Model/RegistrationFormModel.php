@@ -2,6 +2,7 @@
 
 namespace App\Form\Model;
 
+use App\Validator\UniqueUser;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class RegistrationFormModel
@@ -14,6 +15,7 @@ class RegistrationFormModel
     /**
      * @Assert\NotBlank(message="Email не может быть пустым")
      * @Assert\Email(message="Email должен иметь формат электронной почты")
+     * @UniqueUser(message="Вы уже зарегистрированы")
      */
     public string $email;
 
