@@ -2,12 +2,15 @@
 
 namespace App\Controller;
 
+use App\AppEvents;
 use App\Entity\User;
+use App\Event\RegistrationSuccessEvent;
 use App\Form\Model\RegistrationFormModel;
 use App\Form\RegistrationFormType;
 use App\Repository\UserRepository;
 use App\Security\LoginFormAuthenticator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -39,7 +42,8 @@ class SecurityController extends AbstractController
         Request $request,
         UserPasswordEncoderInterface $passwordEncoder,
         GuardAuthenticatorHandler $guard,
-        LoginFormAuthenticator $authenticator
+        LoginFormAuthenticator $authenticator,
+        EventDispatcherInterface $dispatcher
     ): Response {
         $form = $this->createForm(RegistrationFormType::class);
         $form->handleRequest($request);
@@ -59,6 +63,9 @@ class SecurityController extends AbstractController
 
             $em->persist($user);
             $em->flush();
+
+            $event = new RegistrationSuccessEvent($user);
+            $dispatcher->dispatch($event, AppEvents::REGISTRATION_SUCCESS);
 
             return $guard->authenticateUserAndHandleSuccess($user, $request, $authenticator, 'main');
         }
