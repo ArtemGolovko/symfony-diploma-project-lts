@@ -5,3 +5,5 @@ twig:
     exception_controller: null
     form_themes:
         - bootstrap_4_layout.html.twig
+    path:
+        'public/css': css
