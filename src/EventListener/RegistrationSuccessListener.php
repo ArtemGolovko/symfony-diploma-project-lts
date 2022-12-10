@@ -13,15 +13,18 @@ class RegistrationSuccessListener
     private EntityManagerInterface $em;
     private RandomStringGenerator $generator;
     private Mailer $mailer;
+    private UrlGeneratorInterface $urlGenerator;
 
     public function __construct(
         EntityManagerInterface $em,
         RandomStringGenerator $generator,
-        Mailer $mailer
+        Mailer $mailer,
+        UrlGeneratorInterface $urlGenerator
     ) {
         $this->em = $em;
         $this->generator = $generator;
         $this->mailer = $mailer;
+        $this->urlGenerator = $urlGenerator;
     }
 
     public function onRegistrationSuccess(RegistrationSuccessEvent $event)
@@ -33,5 +36,11 @@ class RegistrationSuccessListener
         $this->em->flush();
 
         $this->mailer->sendEmailVerification($user);
+
+        $request = $event->getRequest();
+        $session = $request->getSession();
+
+        $session->set('redirect_path', $this->urlGenerator->generate('app_register'));
+        $session->getFlashBag()->add('success', 'Для завершения регистрации подтвердите ваш email');
     }
 }

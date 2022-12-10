@@ -86,21 +86,32 @@ class SecurityController extends AbstractController
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      * @Route("/verify-email/{verificationCode}",  name="app_verify_email")
      */
-    public function verifyEmail(
-        $verificationCode
-    ): Response {
+    public function verifyEmail($verificationCode, Request $request): Response {
         /** @var User $user */
         $user = $this->getUser();
         $em = $this->getDoctrine()->getManager();
+
+        if ($user->isVerified()) {
+            $path = $this->getTargetPath($request->getSession(), 'main')
+                ?? $this->generateUrl('app_dashboard');
+
+            return $this->redirect($path);
+        }
 
         if ($user->getVerificationCode() === $verificationCode) {
             $user->setVerificationCode(null);
 
             $em->flush();
 
-            return $this->redirectToRoute('app_dashboard');
+            $path = $this->getTargetPath($request->getSession(), 'main')
+            ?? $this->generateUrl('app_dashboard');
+
+            $this->addFlash('success', 'Регистрация успешно завершена');
+
+            return $this->redirect($path);
         }
 
+        $this->addFlash('error', 'Неверный код подтверждения email');
         return $this->redirectToRoute('app_register');
     }
 

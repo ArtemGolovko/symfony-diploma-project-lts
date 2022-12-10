@@ -95,8 +95,11 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
         $session = $request->getSession();
         $session->remove('remember_me');
 
-        $path = $this->getTargetPath($session, 'main')
-            ?? $this->urlGenerator->generate('app_dashboard');
+        $path = $session->get('redirect_path');
+        if (!$path) {
+            $path = $this->getTargetPath($session, 'main')
+                ?? $this->urlGenerator->generate('app_dashboard');
+        }
 
         return new RedirectResponse($path);
     }
