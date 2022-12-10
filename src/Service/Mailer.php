@@ -17,15 +17,18 @@ class Mailer
         $this->mailer = $mailer;
     }
 
-    public function sendEmailVerification(User $user, string $verificationCode)
+    public function sendEmailVerification(User $user)
     {
+        if ($user->isVerified())
+            throw new \LogicException('Supports only unverified users.');
+
         $this->send(
             'email/email_verification.html.twig',
             'Подтверждение електронной почты',
             $user,
-            function (TemplatedEmail $email) use ($verificationCode) {
+            function (TemplatedEmail $email) use ($user) {
                 $email->context([
-                    'verification_code' => $verificationCode
+                    'verification_code' => $user->getVerificationCode()
                 ]);
             }
         );
