@@ -1,0 +1,117 @@
+/** email/base_email.html styles */
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+table {
+    margin: 0;
+    padding: 0;
+}
+
+.root-container, .content-container, .content-center {
+    width: 100%;
+}
+
+.content-container {
+    max-width: 600px;
+}
+
+.header-center {
+    background: #007bff;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    margin-bottom: 8px;
+}
+
+.header-text {
+    color: #ffffff;
+    font: 26px Arial, Helvetica, sans-serif;
+    line-height: 18.5px;
+    -webkit-text-size-adjust: none;
+}
+
+.content {
+    padding: 16px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+h1 {
+    color: #000000;
+    font: 30px Arial, Helvetica, sans-serif;
+    line-height: 25px;
+    -webkit-text-size-adjust: none;
+}
+
+.footer-center {
+    background-color: #ffffff;
+    padding: 16px;
+    margin-top: 8px;
+}
+
+.footer-copy {
+    color: #000000;
+    font: 16px Arial, Helvetica, sans-serif;
+    line-height: 18.5px;
+    -webkit-text-size-adjust: none;
+}
+
+.footer-links {
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.footer-link-facebook, .footer-link-vk, .footer-link-instagram  {
+    display: block;
+}
+
+.footer-link-facebook {
+    margin-right: 32px;
+}
+
+.footer-link-instagram {
+    margin-left: 32px;
+}
+
+/** Shared styles */
+
+img {
+    display: block;
+}
+
+.paragraph {
+    color: #000000;
+    font: 16px Arial, Helvetica, sans-serif;
+    line-height: 18.5px;
+    -webkit-text-size-adjust: none;
+    word-break: break-word;
+}
+
+.link {
+    color: #0000ff;
+    font: 16px Arial, Helvetica, sans-serif;
+    line-height: 18.5px;
+    -webkit-text-size-adjust: none;
+    word-break: break-word;
+}
+
+/** email/email_verification.html.twig */
+
+.verify-button-center {
+    width: 250px;
+    background-color: #007bff;
+    padding: 14px;
+}
+
+.verify-link {
+    color: #ffffff;
+    text-decoration: none;
+    font: 18px Arial, Helvetica, sans-serif;
+    line-height: 18.5px;
+    -webkit-text-size-adjust: none;
+}
+
+
+

@@ -1,0 +1,56 @@
+{% apply inline_css(source('@css/email/email.css')) %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>{{ email.subject }}</title>
+</head>
+<body>
+<table border="0" cellpadding="0" cellspacing="0" class="root-container" background="#f8f9fa" bgcolor="#f8f9fa">
+    <tr>
+        <td>
+            <center class="content-center">
+                <table border="0" cellpadding="0" cellspacing="0" class="content-container">
+                    <tr>
+                        <td>
+                            <center class="header-center"><span class="header-text">BlaBlaArticle</span></center>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table border="0" cellpadding="0" cellspacing="0" class="content" background="#ffffff" bgcolor="#ffffff">
+                                <tr>
+                                    <td>
+                                        <center><h1>{% block title %}{{ email.subject }}{% endblock %}</h1></center>
+                                        {% block content %}{% endblock %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <center class="footer-center">
+                                <span class="footer-copy">&copy; BlaBlaArticle 2022.</span>
+
+                                <table border="0" cellpadding="0" cellspacing="0" class="footer-links">
+                                    <tr>
+                                        <td><a href="#" target="_blank" class="footer-link-facebook"><img src="{{ absolute_url(asset('images/email/facebook.jpg')) }}" border="0" alt="Facebook icon" width="32" height="32" /></a></td>
+                                        <td><a href="#" target="_blank" class="footer-link-vk"><img src="{{ absolute_url(asset('images/email/vk.jpg')) }}" border="0" alt="VK icon" width="32" height="32" /></a></td>
+                                        <td><a href="#" target="_blank" class="footer-link-instagram"><img src="{{ absolute_url(asset('images/email/instagram.jpg')) }}" border="0" alt="Instagram icon" width="32" height="32" /></a></td>
+                                    </tr>
+                                </table>
+                            </center>
+                        </td>
+                    </tr>
+                </table>
+            </center>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
+
+{% endapply %}

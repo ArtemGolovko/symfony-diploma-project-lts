@@ -11,9 +11,16 @@
             {{ error }}
         </div>
     {% endif %}
-{#    <div class="alert alert-success" role="alert">#}
-{#        Для завершения регистрации подтвердите ваш email#}
-{#    </div>#}
+    {% for flash in app.flashes('success') %}
+        <div class="alert alert-success" role="alert">
+            {{ flash }}
+        </div>
+    {% endfor %}
+    {% for flash in app.flashes('error') %}
+        <div class="alert alert-danger" role="alert">
+            {{ flash }}
+        </div>
+    {% endfor %}
     {{ form_start(form, { attr: { class: 'form-signin'} }) }}
         {{ form_row(form.name, {
             label: 'Ваше имя',

@@ -39,6 +39,11 @@ class User implements UserInterface
      */
     private $name;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $verificationCode;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -130,5 +135,24 @@ class User implements UserInterface
         $this->name = $name;
 
         return $this;
+    }
+
+
+    public function getVerificationCode(): ?string
+    {
+        return $this->verificationCode;
+    }
+
+
+    public function setVerificationCode(?string $verificationCode): self
+    {
+        $this->verificationCode = $verificationCode;
+
+        return $this;
+    }
+
+    public function isVerified(): bool
+    {
+        return !$this->verificationCode;
     }
 }
