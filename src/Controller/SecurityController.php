@@ -24,6 +24,7 @@ class SecurityController extends AbstractController
     use TargetPathTrait;
     /**
      * @Route("/login", name="app_login")
+     * @IsGranted("IS_ANONYMOUS")
      */
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -39,6 +40,7 @@ class SecurityController extends AbstractController
 
     /**
      * @Route("/register", name="app_register")
+     * @IsGranted("IS_ANONYMOUS_OR_UNVERIFIED")
      */
     public function register(
         Request $request,
