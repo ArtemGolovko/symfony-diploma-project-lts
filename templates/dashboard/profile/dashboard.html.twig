@@ -4,16 +4,7 @@
     <h1 class="mt-4">Рабочий стол</h1>
     <div class="row">
         <div class="col-xl-8 border-right">
-            {% for flash in app.flashes('success') %}
-                <div class="alert alert-success" role="alert">
-                    {{ flash }}
-                </div>
-            {% endfor %}
-            {% for flash in app.flashes('error') %}
-                <div class="alert alert-danger" role="alert">
-                    {{ flash }}
-                </div>
-            {% endfor %}
+            {% include 'partial/flashes.html.twig' %}
             <div class="alert alert-warning" role="alert">
                 Подписка истекает через 2 дня
             </div>
