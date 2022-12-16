@@ -9,6 +9,11 @@
                     {{ flash }}
                 </div>
             {% endfor %}
+            {% for flash in app.flashes('error') %}
+                <div class="alert alert-danger" role="alert">
+                    {{ flash }}
+                </div>
+            {% endfor %}
             <div class="alert alert-warning" role="alert">
                 Подписка истекает через 2 дня
             </div>
