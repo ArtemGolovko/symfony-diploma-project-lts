@@ -25,6 +25,7 @@ security:
             remember_me:
                 secret: '%kernel.secret%'
                 lifetime: '%env(int:REMEMBER_ME_LIFETIME)%'
+            access_denied_handler: App\Security\AccessDeniedHandler
 
 
             # activate different ways to authenticate

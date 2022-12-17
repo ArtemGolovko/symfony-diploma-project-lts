@@ -11,16 +11,7 @@
             {{ error }}
         </div>
     {% endif %}
-    {% for flash in app.flashes('success') %}
-        <div class="alert alert-success" role="alert">
-            {{ flash }}
-        </div>
-    {% endfor %}
-    {% for flash in app.flashes('error') %}
-        <div class="alert alert-danger" role="alert">
-            {{ flash }}
-        </div>
-    {% endfor %}
+    {% include 'partial/flashes.html.twig' %}
     {{ form_start(form, { attr: { class: 'form-signin'} }) }}
         {{ form_row(form.name, {
             label: 'Ваше имя',
