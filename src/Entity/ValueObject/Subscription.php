@@ -38,6 +38,8 @@ class Subscription
      */
     public function getLevel(): string
     {
+        if ($this->isExpired()) return self::FREE;
+        
         return $this->level;
     }
 
@@ -72,13 +74,6 @@ class Subscription
         if (null === $this->expiresAt) return false;
 
         return (new \DateTimeImmutable()) > $this->expiresAt;
-    }
-
-    public function getActualLevel(): string
-    {
-        if (self::FREE === $this->level || $this->isExpired()) return self::FREE;
-
-        return $this->level;
     }
 
     public function isSubordinates(string $level): bool
