@@ -19,7 +19,7 @@ class UserFixtures extends BaseFixtures
 
     public function loadData(ObjectManager $manager): void
     {
-        $this->createMany(User::class, 5, function (User $user) {
+        $this->createMany(User::class, 10, function (User $user) {
            $user
                ->setName($this->faker->firstName)
                ->setEmail($this->faker->email)
@@ -27,6 +27,15 @@ class UserFixtures extends BaseFixtures
                    $this->passwordEncoder->encodePassword($user, 'query')
                )
            ;
+           if ($this->faker->boolean(30)) {
+               $user
+                   ->getSubscription()
+                   ->setLevel(
+                       $this->faker->boolean(30) ? 'PRO' : 'PLUS',
+                       new \DateTimeImmutable('+1 week')
+                   )
+               ;
+           }
         });
     }
 }
