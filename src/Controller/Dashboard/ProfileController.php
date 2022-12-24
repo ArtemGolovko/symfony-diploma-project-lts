@@ -2,14 +2,16 @@
 
 namespace App\Controller\Dashboard;
 
+use App\Entity\User;
 use App\Entity\ValueObject\Subscription;
-use Carbon\Carbon;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
  * @IsGranted("IS_AUTHENTICATED_AND_VERIFIED")
@@ -45,6 +47,42 @@ class ProfileController extends AbstractController
     public function subscription(): Response
     {
         return $this->render('dashboard/profile/subscription.html.twig');
+    }
+
+    /**
+     * @Route("/dashboard/order-subscription/{level}", name="app_dashboard_request_subscription")
+     */
+    public function requestSubscription($level, Request $request, CsrfTokenManagerInterface $manager): Response
+    {
+        $rawToken = $request->query->get('_csrf', '');
+        $csrfToken = new CsrfToken('request', $rawToken);
+        if ($manager->isTokenValid($csrfToken)) {
+            /** @var User $user */
+            $user = $this->getUser();
+            $user
+                ->getSubscription()
+                ->setLevel($level, new \DateTimeImmutable('+1 week'))
+            ;
+
+            $this
+                ->getDoctrine()
+                ->getManager()
+                ->flush()
+            ;
+
+            $request
+                ->getSession()
+                ->getFlashBag()
+                ->add('success',
+                    sprintf('Подписка %s оформлена, до %s',
+                        mb_convert_case($level, MB_CASE_TITLE),
+                        $user->getSubscription()->getExpiresAt()->format('d.m.Y')
+                    )
+                )
+            ;
+        }
+
+        return $this->redirectToRoute('app_dashboard_subscription');
     }
 
     /**

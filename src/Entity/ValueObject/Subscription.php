@@ -39,7 +39,7 @@ class Subscription
     public function getLevel(): string
     {
         if ($this->isExpired()) return self::FREE;
-        
+
         return $this->level;
     }
 
@@ -81,7 +81,7 @@ class Subscription
         if (!in_array($level, [self::FREE, self::PLUS, self::PRO]))
             throw new \InvalidArgumentException('Invalid level.');
 
-        $currentLevel = $this->getActualLevel();
+        $currentLevel = $this->getLevel();
 
         if (self::FREE === $level || self::PRO === $currentLevel || $level === $currentLevel)
             return true;
