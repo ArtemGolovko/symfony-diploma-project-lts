@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use App\Entity\ValueObject\Subscription;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -43,6 +44,20 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $verificationCode;
+
+    /**
+     * @ORM\Embedded(class=Subscription::class, columnPrefix="subscription_")
+     */
+    private $subscription;
+
+    /**
+     * @param $subscription
+     */
+    public function __construct()
+    {
+        $this->subscription = new Subscription();
+    }
+
 
     public function getId(): ?int
     {
@@ -154,5 +169,13 @@ class User implements UserInterface
     public function isVerified(): bool
     {
         return !$this->verificationCode;
+    }
+
+    /**
+     * @return Subscription
+     */
+    public function getSubscription(): Subscription
+    {
+        return $this->subscription;
     }
 }
