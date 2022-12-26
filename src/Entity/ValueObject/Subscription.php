@@ -13,10 +13,12 @@ class Subscription
     public const PLUS = 'PLUS';
     public const PRO = 'PRO';
 
+    public const HIERARCHY = [self::FREE, self::PLUS, self::PRO];
+
     /**
      * @ORM\Column(type="string", length=4)
      */
-    private string $level = self::FREE;
+    private string $level = self::HIERARCHY[0];
 
     /**
      * @ORM\Column(type="date_immutable", nullable=true)
@@ -27,7 +29,7 @@ class Subscription
      * @param string $level
      * @param \DateTimeImmutable|null $expiresAt
      */
-    public function __construct(string $level = self::FREE, ?\DateTimeImmutable $expiresAt = null)
+    public function __construct(string $level = self::HIERARCHY[0], ?\DateTimeImmutable $expiresAt = null)
     {
         $this->setLevel($level, $expiresAt);
     }
@@ -38,7 +40,7 @@ class Subscription
      */
     public function getLevel(): string
     {
-        if ($this->isExpired()) return self::FREE;
+        if ($this->isExpired()) return self::HIERARCHY[0];
 
         return $this->level;
     }
@@ -49,14 +51,14 @@ class Subscription
      */
     public function setLevel(string $level, ?\DateTimeImmutable $expiresAt = null): self
     {
-        if (!in_array($level, [self::FREE, self::PLUS, self::PRO]))
+        if (!in_array($level, self::HIERARCHY))
             throw new \InvalidArgumentException('Invalid level.');
 
-        if (self::FREE !== $level && null === $expiresAt)
+        if (self::HIERARCHY[0] !== $level && null === $expiresAt)
                 throw new \InvalidArgumentException("Cannot set level {$level} with unlimited lifetime");
 
         $this->level = $level;
-        $this->expiresAt = self::FREE === $level ? null : $expiresAt;
+        $this->expiresAt = self::HIERARCHY[0] === $level ? null : $expiresAt;
 
         return $this;
     }
@@ -78,14 +80,9 @@ class Subscription
 
     public function isSubordinates(string $level): bool
     {
-        if (!in_array($level, [self::FREE, self::PLUS, self::PRO]))
+        if (!in_array($level, self::HIERARCHY))
             throw new \InvalidArgumentException('Invalid level.');
 
-        $currentLevel = $this->getLevel();
-
-        if (self::FREE === $level || self::PRO === $currentLevel || $level === $currentLevel)
-            return true;
-
-        return false;
+        return array_search($level, self::HIERARCHY) <= array_search($this->getLevel(), self::HIERARCHY);
     }
 }
