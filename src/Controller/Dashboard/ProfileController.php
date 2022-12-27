@@ -2,10 +2,17 @@
 
 namespace App\Controller\Dashboard;
 
+use App\Entity\User;
+use App\Entity\ValueObject\Subscription;
+use App\Service\SubscriptionService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
  * @IsGranted("IS_AUTHENTICATED_AND_VERIFIED")
@@ -15,8 +22,17 @@ class ProfileController extends AbstractController
     /**
      * @Route("/dashboard", name="app_dashboard")
      */
-    public function dashboard(): Response
+    public function dashboard(SessionInterface $session, SubscriptionService $subscriptionService): Response
     {
+        $diffInDays = $subscriptionService->expiresInDays($this->getUser()->getSubscription());
+
+        if ($diffInDays && $diffInDays < 3) {
+            $session->getFlashBag()->add(
+                'warning',
+                sprintf("Подписка истекает через %d %s", $diffInDays, ($diffInDays === 1) ? "день" : "дня")
+            );
+        }
+
         return $this->render('dashboard/profile/dashboard.html.twig');
     }
 
@@ -26,6 +42,35 @@ class ProfileController extends AbstractController
     public function subscription(): Response
     {
         return $this->render('dashboard/profile/subscription.html.twig');
+    }
+
+    /**
+     * @Route("/dashboard/order-subscription/{level}", name="app_dashboard_request_subscription")
+     */
+    public function requestSubscription(
+        $level,
+        Request $request,
+        CsrfTokenManagerInterface $manager,
+        SubscriptionService $subscriptionService
+    ): Response {
+        $csrfToken = new CsrfToken('request', $request->query->get('_csrf', ''));
+        $flashBug = $request->getSession()->getFlashBag();
+
+        if ($manager->isTokenValid($csrfToken)) {
+            $user = $this->getUser();
+            $subscriptionService->upgrade($user, $level);
+
+            $date = $user->getSubscription()->getExpiresAt()->format('d.m.Y');
+
+            $flashBug->add(
+                'success',
+                sprintf('Подписка %s оформлена, до %s',  mb_convert_case($level, MB_CASE_TITLE), $date)
+            );
+        } else {
+            $flashBug->add('error', 'Неверный csrf токен');
+        }
+
+        return $this->redirectToRoute('app_dashboard_subscription');
     }
 
     /**
