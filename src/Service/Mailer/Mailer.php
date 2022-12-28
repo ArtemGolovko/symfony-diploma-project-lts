@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Mailer;
 
 use App\Entity\User;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -17,42 +17,39 @@ class Mailer
         $this->mailer = $mailer;
     }
 
-    public function sendEmailVerification(User $user)
+    public function sendEmailVerification(SenderInterface $sender, string $verificationCode)
     {
-        if ($user->isVerified())
-            throw new \LogicException('Supports only unverified users.');
-
         $this->send(
             'email/email_verification.html.twig',
             'Подтверждение электронной почты',
-            $user,
-            function (TemplatedEmail $email) use ($user) {
+            $sender,
+            function (TemplatedEmail $email) use ($verificationCode) {
                 $email->context([
-                    'verification_code' => $user->getVerificationCode()
+                    'verification_code' => $verificationCode
                 ]);
             }
         );
     }
 
-    public function sendUpgradeEmailVerification(User $user)
+    public function sendUpgradeEmailVerification(SenderInterface $sender, $verificationCode)
     {
         $this->send(
             'email/upgrade_email_verification.html.twig',
             'Изменение электронной почты',
-            $user,
-            function (TemplatedEmail $email) use ($user) {
+            $sender,
+            function (TemplatedEmail $email) use ($verificationCode) {
                 $email->context([
-                    'verification_code' => $user->getUpgradeEmailVerificationCode()
+                    'verification_code' => $verificationCode
                 ]);
             }
         );
     }
 
-    private function send(string $template, string $subject, User $user, \Closure $callback = null)
+    private function send(string $template, string $subject, SenderInterface $sender, \Closure $callback = null)
     {
         $email = (new TemplatedEmail())
             ->from(new Address('noreply@blablaarticle.com', 'BlaBlaArticle'))
-            ->to(new Address($user->getEmail(), $user->getName()))
+            ->to(new Address($sender->getEmail(), $sender->getName()))
             ->subject($subject)
             ->htmlTemplate($template)
         ;

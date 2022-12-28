@@ -5,6 +5,8 @@ namespace App\Controller\Dashboard;
 use App\Entity\User;
 use App\Form\Model\ProfileFormModel;
 use App\Form\ProfileFormType;
+use App\Service\Mailer\Mailer;
+use App\Service\Mailer\Sender;
 use App\Service\SubscriptionService;
 use App\Service\UpgradeEmailService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -103,7 +105,8 @@ class ProfileController extends AbstractController
     public function profile(
         Request $request,
         UserPasswordEncoderInterface $passwordEncoder,
-        UpgradeEmailService $upgradeEmail
+        UpgradeEmailService $upgradeEmail,
+        Mailer $mailer
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -123,7 +126,9 @@ class ProfileController extends AbstractController
                 $user->setPassword($passwordEncoder->encodePassword($user, $data->plainPassword));
 
             if ($data->email && $data->email !== $user->getEmail()) {
-                $upgradeEmail->requestUpgrade($user, $data->email);
+                $verificationCode = $upgradeEmail->requestUpgrade($user, $data->email);
+                $mailer->sendUpgradeEmailVerification(new Sender($user->getName(), $data->email), $verificationCode);
+
                 $flashBag->add('success', 'Для изменения электронной почты подтвердите новую электронною почту');
             }
 

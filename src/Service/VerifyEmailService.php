@@ -5,8 +5,9 @@ namespace App\Service;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 
-class UpgradeEmailService
+class VerifyEmailService
 {
+
 
     private RandomStringGenerator $generator;
     private EntityManagerInterface $em;
@@ -17,31 +18,24 @@ class UpgradeEmailService
         $this->em = $em;
     }
 
-    public function requestUpgrade(User $user, string $newEmail): string
+    public function requestVerification(User $user): string
     {
         $verificationCode = $this->generator->generate(255);
 
-        $user
-            ->setUpgradeEmail($newEmail)
-            ->setUpgradeEmailVerificationCode($verificationCode)
-        ;
+        $user->setVerificationCode($verificationCode);
 
         $this->em->flush();
 
         return $verificationCode;
     }
 
-    public function upgradeEmail(User $user, string $verificationCode): bool
+    public function verifyEmail(User $user, string $verificationCode): bool
     {
-        if ($user->getUpgradeEmailVerificationCode() !== $verificationCode) {
+        if ($user->getVerificationCode() !== $verificationCode) {
             return false;
         }
 
-        $user
-            ->setEmail($user->getUpgradeEmail())
-            ->setUpgradeEmail(null)
-            ->setUpgradeEmailVerificationCode(null)
-        ;
+        $user->setVerificationCode(null);
 
         $this->em->flush();
 
