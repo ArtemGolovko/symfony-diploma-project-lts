@@ -1,13 +1,13 @@
 {% extends 'base_dashboard.html.twig' %}
 
+{% form_theme form 'form/register_layout.html.twig' %}
+
 {% block content %}
     <h1 class="mt-4">Профиль</h1>
     <div class="row">
 
         <div class="col-xl-6">
-            <div class="alert alert-success" role="alert">
-                Профиль успешно изменен
-            </div>
+            {% include 'partial/flashes.html.twig' %}
 
             <div class="card my-4">
                 <div class="card-body">
@@ -17,28 +17,39 @@
                 </div>
             </div>
 
-            <form>
-                <div class="form-label-group">
-                    <input type="text" id="inputName" class="form-control" placeholder="Ваше имя" required value="Волков Михаил" autofocus>
-                    <label for="inputName">Ваше имя</label>
-                </div>
-                <div class="form-label-group">
-                    <input type="email" id="inputEmail" class="form-control" placeholder="Ваш Email" required value="email@example.com">
-                    <label for="inputEmail">Ваш Email</label>
-                </div>
+            {{ form_start(form) }}
+                {{ form_row(form.name, {
+                    label: 'Ваше имя',
+                    attrs: {
+                        placeholder: 'Ваше имя',
+                        autofocus: true
+                    },
+                    required: true
+                }) }}
+                {{ form_row(form.email, {
+                    label: 'Ваш Email',
+                    attrs: {
+                        placeholder: 'Ваш Email',
+                    },
+                    required: true
+                }) }}
+                {{ form_row(form.plainPassword.password, {
+                    label: 'Пароль',
+                    attr: {
+                        placeholder: 'Пароль'
+                    },
+                    required: false
+                }) }}
 
-                <div class="form-label-group">
-                    <input type="password" id="inputPassword" class="form-control" placeholder="Пароль" required>
-                    <label for="inputPassword">Пароль</label>
-                </div>
-
-                <div class="form-label-group">
-                    <input type="password" id="inputConfirmPassword" class="form-control" placeholder="Подтверждение пароля" required>
-                    <label for="inputConfirmPassword">Подтверждение пароля</label>
-                </div>
-
+                {{ form_row(form.plainPassword.confirmPassword, {
+                    label: 'Подтверждение пароля',
+                    attr: {
+                        placeholder: 'Подтверждение пароля'
+                    },
+                    required: false
+                }) }}
                 <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Изменить</button>
-            </form>
+            {{ form_end(form) }}
         </div>
     </div>
 {% endblock %}
