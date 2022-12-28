@@ -24,11 +24,25 @@ class Mailer
 
         $this->send(
             'email/email_verification.html.twig',
-            'Подтверждение електронной почты',
+            'Подтверждение электронной почты',
             $user,
             function (TemplatedEmail $email) use ($user) {
                 $email->context([
                     'verification_code' => $user->getVerificationCode()
+                ]);
+            }
+        );
+    }
+
+    public function sendUpgradeEmailVerification(User $user)
+    {
+        $this->send(
+            'email/upgrade_email_verification.html.twig',
+            'Изменение электронной почты',
+            $user,
+            function (TemplatedEmail $email) use ($user) {
+                $email->context([
+                    'verification_code' => $user->getUpgradeEmailVerificationCode()
                 ]);
             }
         );

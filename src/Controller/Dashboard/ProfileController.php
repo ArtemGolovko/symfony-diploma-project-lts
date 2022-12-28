@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Form\Model\ProfileFormModel;
 use App\Form\ProfileFormType;
 use App\Service\SubscriptionService;
+use App\Service\UpgradeEmailService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -76,10 +77,34 @@ class ProfileController extends AbstractController
     }
 
     /**
+     * @Route("/dashboard/verify-upgrade-email/{verificationCode}", name="app_dashboard_verify_upgrade_email")
+     */
+    public function verifyUpgradeEmail(
+        string $verificationCode,
+        UpgradeEmailService $upgradeEmail,
+        SessionInterface $session
+    ): Response {
+        /** @var User $user */
+        $user = $this->getUser();
+        $flashBag = $session->getFlashBag();
+
+        if ($upgradeEmail->upgradeEmail($user, $verificationCode)) {
+            $flashBag->add('success', 'Email изменен');
+        } else {
+            $flashBag->add('error', 'Не правильный код подтверждения');
+        }
+
+        return $this->redirectToRoute('app_dashboard_profile');
+    }
+
+    /**
      * @Route("/dashboard/profile", name="app_dashboard_profile")
      */
-    public function profile(Request $request, UserPasswordEncoderInterface $passwordEncoder): Response
-    {
+    public function profile(
+        Request $request,
+        UserPasswordEncoderInterface $passwordEncoder,
+        UpgradeEmailService $upgradeEmail
+    ): Response {
         /** @var User $user */
         $user = $this->getUser();
 
@@ -96,6 +121,11 @@ class ProfileController extends AbstractController
 
             if ($data->plainPassword)
                 $user->setPassword($passwordEncoder->encodePassword($user, $data->plainPassword));
+
+            if ($data->email && $data->email !== $user->getEmail()) {
+                $upgradeEmail->requestUpgrade($user, $data->email);
+                $flashBag->add('success', 'Для изменения электронной почты подтвердите новую электронною почту');
+            }
 
             $this->getDoctrine()->getManager()->flush();
             $flashBag->add('success', 'Профиль успешно изменен');
