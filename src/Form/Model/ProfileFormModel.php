@@ -13,6 +13,7 @@ class ProfileFormModel
         $model = new self();
         $model->name = $user->getName();
         $model->email = $user->getEmail();
+        $model->plainPassword = null;
 
         return $model;
     }
@@ -21,6 +22,7 @@ class ProfileFormModel
 
     /**
      * @Assert\Email(message="Email должен иметь формат электронной почты")
+     * @UniqueUser(message="Email уже используется", allowYourself=true)
      */
     public ?string $email;
 

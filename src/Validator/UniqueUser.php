@@ -14,4 +14,6 @@ class UniqueUser extends Constraint
      * Then, use these in your validator class.
      */
     public $message = 'The value "{{ value }}" is not valid.';
+
+    public $allowYourself = false;
 }
