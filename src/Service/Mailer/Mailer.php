@@ -17,7 +17,7 @@ class Mailer
         $this->mailer = $mailer;
     }
 
-    public function sendEmailVerification(SenderInterface $sender, string $verificationCode)
+    public function sendEmailVerification(ReceiverInterface $sender, string $verificationCode)
     {
         $this->send(
             'email/email_verification.html.twig',
@@ -31,7 +31,7 @@ class Mailer
         );
     }
 
-    public function sendUpgradeEmailVerification(SenderInterface $sender, $verificationCode)
+    public function sendUpgradeEmailVerification(ReceiverInterface $sender, $verificationCode)
     {
         $this->send(
             'email/upgrade_email_verification.html.twig',
@@ -45,7 +45,7 @@ class Mailer
         );
     }
 
-    private function send(string $template, string $subject, SenderInterface $sender, \Closure $callback = null)
+    private function send(string $template, string $subject, ReceiverInterface $sender, \Closure $callback = null)
     {
         $email = (new TemplatedEmail())
             ->from(new Address('noreply@blablaarticle.com', 'BlaBlaArticle'))

@@ -4,14 +4,14 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use App\Entity\ValueObject\Subscription;
-use App\Service\Mailer\SenderInterface;
+use App\Service\Mailer\ReceiverInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  */
-class User implements UserInterface, SenderInterface
+class User implements UserInterface, ReceiverInterface
 {
     /**
      * @ORM\Id

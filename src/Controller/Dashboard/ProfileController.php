@@ -6,7 +6,7 @@ use App\Entity\User;
 use App\Form\Model\ProfileFormModel;
 use App\Form\ProfileFormType;
 use App\Service\Mailer\Mailer;
-use App\Service\Mailer\Sender;
+use App\Service\Mailer\Receiver;
 use App\Service\SubscriptionService;
 use App\Service\UpgradeEmailService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -127,7 +127,7 @@ class ProfileController extends AbstractController
 
             if ($data->email && $data->email !== $user->getEmail()) {
                 $verificationCode = $upgradeEmail->requestUpgrade($user, $data->email);
-                $mailer->sendUpgradeEmailVerification(new Sender($user->getName(), $data->email), $verificationCode);
+                $mailer->sendUpgradeEmailVerification(new Receiver($user->getName(), $data->email), $verificationCode);
 
                 $flashBag->add('success', 'Для изменения электронной почты подтвердите новую электронною почту');
             }

@@ -2,7 +2,7 @@
 
 namespace App\Service\Mailer;
 
-class Sender implements SenderInterface
+class Receiver implements ReceiverInterface
 {
 
 

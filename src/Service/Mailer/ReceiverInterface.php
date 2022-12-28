@@ -2,7 +2,7 @@
 
 namespace App\Service\Mailer;
 
-interface SenderInterface
+interface ReceiverInterface
 {
     public function getName(): string;
 
