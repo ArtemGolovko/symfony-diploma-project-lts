@@ -18,13 +18,7 @@ class RepeatedPasswordExtension extends AbstractType
         $builder
             ->addViewTransformer(new RepeatedPasswordTransformer())
             ->add('password', PasswordType::class, [
-                'constraints' => [
-                    new NotBlank([ 'message' => 'Пароль не может быть пустым' ]),
-                    new Length([
-                        'min' => 6,
-                        'minMessage' => 'Пароль должен иметь длину хотя бы в шесть символов'
-                    ])
-                ]
+                'constraints' => $options['constraints']
             ])
             ->add('confirmPassword', PasswordType::class, [
                 'constraints' => [
@@ -37,7 +31,13 @@ class RepeatedPasswordExtension extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-
+            'constraints' => [
+                new NotBlank([ 'message' => 'Пароль не может быть пустым' ]),
+                new Length([
+                    'min' => 6,
+                    'minMessage' => 'Пароль должен иметь длину хотя бы в шесть символов'
+                ])
+            ]
         ]);
     }
 }

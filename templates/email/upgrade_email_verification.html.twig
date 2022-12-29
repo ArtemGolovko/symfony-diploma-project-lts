@@ -1,0 +1,13 @@
+{% extends 'email/base_email.html.twig' %}
+
+{% block content %}
+    <p class="paragraph">Добрый день, {{ email.toName }}, для изменения электронной почты подтвердите новую электронною почту.</p>
+    <center>
+        <center class="verify-button-center">
+            <a class="verify-link" href="{{ url('app_dashboard_verify_upgrade_email', { verificationCode: verification_code }) }}" target="_blank">Изменить почту</a>
+        </center>
+    </center>
+    <p class="paragraph">Не сработало? Перейдите по ссылке ниже. <br />
+        <a class="link" href="{{ url('app_dashboard_verify_upgrade_email', { verificationCode: verification_code }) }}" target="_blank">{{ url('app_dashboard_verify_upgrade_email', { verificationCode: verification_code }) }}</a>
+    </p>
+{% endblock %}

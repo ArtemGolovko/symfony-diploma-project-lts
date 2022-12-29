@@ -19,10 +19,6 @@ class ConfirmPasswordValidator extends ConstraintValidator
         }
         /* @var $constraint ConfirmPassword */
 
-        if (null === $value || '' === $value) {
-            return;
-        }
-        
         $originalValue = $this
             ->context
             ->getObject()

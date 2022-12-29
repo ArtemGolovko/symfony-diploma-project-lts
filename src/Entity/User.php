@@ -4,13 +4,14 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use App\Entity\ValueObject\Subscription;
+use App\Service\Mailer\ReceiverInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  */
-class User implements UserInterface
+class User implements UserInterface, ReceiverInterface
 {
     /**
      * @ORM\Id
@@ -51,6 +52,16 @@ class User implements UserInterface
     private $subscription;
 
     /**
+     * @ORM\Column(type="string", length=180, nullable=true)
+     */
+    private $upgradeEmail;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $upgradeEmailVerificationCode;
+
+    /**
      * @param $subscription
      */
     public function __construct()
@@ -64,7 +75,7 @@ class User implements UserInterface
         return $this->id;
     }
 
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -140,7 +151,7 @@ class User implements UserInterface
         // $this->plainPassword = null;
     }
 
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -177,5 +188,29 @@ class User implements UserInterface
     public function getSubscription(): Subscription
     {
         return $this->subscription;
+    }
+
+    public function getUpgradeEmail(): ?string
+    {
+        return $this->upgradeEmail;
+    }
+
+    public function setUpgradeEmail(?string $upgradeEmail): self
+    {
+        $this->upgradeEmail = $upgradeEmail;
+
+        return $this;
+    }
+
+    public function getUpgradeEmailVerificationCode(): ?string
+    {
+        return $this->upgradeEmailVerificationCode;
+    }
+
+    public function setUpgradeEmailVerificationCode(?string $upgradeEmailVerificationCode): self
+    {
+        $this->upgradeEmailVerificationCode = $upgradeEmailVerificationCode;
+
+        return $this;
     }
 }

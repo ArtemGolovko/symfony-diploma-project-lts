@@ -3,42 +3,34 @@
 namespace App\EventListener;
 
 use App\Event\RegistrationSuccessEvent;
-use App\Service\Mailer;
-use App\Service\RandomStringGenerator;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\Mailer\Mailer;
+use App\Service\VerifyEmailService;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class RegistrationSuccessListener
 {
-    private EntityManagerInterface $em;
-    private RandomStringGenerator $generator;
     private Mailer $mailer;
     private UrlGeneratorInterface $urlGenerator;
+    private VerifyEmailService $verifyEmail;
 
     public function __construct(
-        EntityManagerInterface $em,
-        RandomStringGenerator $generator,
+        VerifyEmailService $verifyEmail,
         Mailer $mailer,
         UrlGeneratorInterface $urlGenerator
     ) {
-        $this->em = $em;
-        $this->generator = $generator;
         $this->mailer = $mailer;
         $this->urlGenerator = $urlGenerator;
+        $this->verifyEmail = $verifyEmail;
     }
 
     public function onRegistrationSuccess(RegistrationSuccessEvent $event)
     {
-        $user = ($event->getUser())
-            ->setVerificationCode($this->generator->generate(255))
-        ;
+        $user = $event->getUser();
+        $verificationCode = $this->verifyEmail->requestVerification($user);
 
-        $this->em->flush();
+        $this->mailer->sendEmailVerification($user, $verificationCode);
 
-        $this->mailer->sendEmailVerification($user);
-
-        $request = $event->getRequest();
-        $session = $request->getSession();
+        $session = $event->getRequest()->getSession();
 
         $session->set('redirect_path', $this->urlGenerator->generate('app_register'));
         $session->getFlashBag()->add('success', 'Для завершения регистрации подтвердите ваш email');
