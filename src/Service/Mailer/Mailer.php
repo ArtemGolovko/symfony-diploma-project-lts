@@ -31,15 +31,15 @@ class Mailer
         );
     }
 
-    public function sendUpgradeEmailVerification(ReceiverInterface $sender, $verificationCode)
+    public function sendNewEmailVerification(ReceiverInterface $sender, $signedUrl)
     {
         $this->send(
-            'email/upgrade_email_verification.html.twig',
+            'email/new_email_verification.html.twig',
             'Изменение электронной почты',
             $sender,
-            function (TemplatedEmail $email) use ($verificationCode) {
+            function (TemplatedEmail $email) use ($signedUrl) {
                 $email->context([
-                    'verification_code' => $verificationCode
+                    'signed_url' => $signedUrl
                 ]);
             }
         );

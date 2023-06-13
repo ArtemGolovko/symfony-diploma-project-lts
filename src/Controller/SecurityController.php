@@ -89,7 +89,6 @@ class SecurityController extends AbstractController
     public function verifyEmail(VerifyEmailHelperInterface $verifyEmailHelper, Request $request): Response {
         /** @var User $user */
         $user = $this->getUser();
-        $em = $this->getDoctrine()->getManager();
 
         if ($user->isVerified()) {
             $path = $this->getTargetPath($request->getSession(), 'main')
@@ -106,7 +105,7 @@ class SecurityController extends AbstractController
         }
 
         $user->setIsVerified(true);
-        $em->flush();
+        $this->getDoctrine()->getManager()->flush();
 
         $path = $this->getTargetPath($request->getSession(), 'main')
             ?? $this->generateUrl('app_dashboard');

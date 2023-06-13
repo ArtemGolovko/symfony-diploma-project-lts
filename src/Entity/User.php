@@ -52,16 +52,6 @@ class User implements UserInterface, ReceiverInterface
     private $subscription;
 
     /**
-     * @ORM\Column(type="string", length=180, nullable=true)
-     */
-    private $upgradeEmail;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $upgradeEmailVerificationCode;
-
-    /**
      * @param $subscription
      */
     public function __construct()
@@ -180,29 +170,5 @@ class User implements UserInterface, ReceiverInterface
     public function getSubscription(): Subscription
     {
         return $this->subscription;
-    }
-
-    public function getUpgradeEmail(): ?string
-    {
-        return $this->upgradeEmail;
-    }
-
-    public function setUpgradeEmail(?string $upgradeEmail): self
-    {
-        $this->upgradeEmail = $upgradeEmail;
-
-        return $this;
-    }
-
-    public function getUpgradeEmailVerificationCode(): ?string
-    {
-        return $this->upgradeEmailVerificationCode;
-    }
-
-    public function setUpgradeEmailVerificationCode(?string $upgradeEmailVerificationCode): self
-    {
-        $this->upgradeEmailVerificationCode = $upgradeEmailVerificationCode;
-
-        return $this;
     }
 }

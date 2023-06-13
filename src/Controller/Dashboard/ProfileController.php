@@ -8,7 +8,6 @@ use App\Form\ProfileFormType;
 use App\Service\Mailer\Mailer;
 use App\Service\Mailer\Receiver;
 use App\Service\SubscriptionService;
-use App\Service\UpgradeEmailService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +17,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
+use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 
 /**
  * @IsGranted("IS_AUTHENTICATED_AND_VERIFIED")
@@ -79,22 +80,39 @@ class ProfileController extends AbstractController
     }
 
     /**
-     * @Route("/dashboard/verify-upgrade-email/{verificationCode}", name="app_dashboard_verify_upgrade_email")
+     * @Route("/dashboard/verify-new-email", name="app_dashboard_verify_new_email")
      */
-    public function verifyUpgradeEmail(
-        string $verificationCode,
-        UpgradeEmailService $upgradeEmail,
-        SessionInterface $session
+    public function verifyNewEmail(
+        Request $request,
+        VerifyEmailHelperInterface $verifyEmailHelper
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
-        $flashBag = $session->getFlashBag();
+        $flashBag = $request->getSession()->getFlashBag();
 
-        if ($upgradeEmail->upgradeEmail($user, $verificationCode)) {
-            $flashBag->add('success', 'Email изменен');
-        } else {
+        $newEmail = $request->get('new_email');
+
+        if (null === $newEmail) {
             $flashBag->add('error', 'Не правильный код подтверждения');
+            return $this->redirectToRoute('app_dashboard_profile');
         }
+
+        if ($user->getEmail() === $newEmail) {
+            $flashBag->add('error', 'Ви уже изминили почту');
+            return $this->redirectToRoute('app_dashboard_profile');
+        }
+
+        try {
+            $verifyEmailHelper->validateEmailConfirmation($request->getUri(), $user->getId(), $newEmail);
+        } catch (VerifyEmailExceptionInterface $exception) {
+            $flashBag->add('error', 'Не правильный код подтверждения');
+            return $this->redirectToRoute('app_dashboard_profile');
+        }
+
+        $user->setEmail($newEmail);
+        $this->getDoctrine()->getManager()->flush();
+
+        $flashBag->add('success', 'Email изменен');
 
         return $this->redirectToRoute('app_dashboard_profile');
     }
@@ -103,10 +121,10 @@ class ProfileController extends AbstractController
      * @Route("/dashboard/profile", name="app_dashboard_profile")
      */
     public function profile(
-        Request $request,
+        Request                      $request,
         UserPasswordEncoderInterface $passwordEncoder,
-        UpgradeEmailService $upgradeEmail,
-        Mailer $mailer
+        VerifyEmailHelperInterface   $verifyEmailHelper,
+        Mailer                       $mailer
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -126,8 +144,14 @@ class ProfileController extends AbstractController
                 $user->setPassword($passwordEncoder->encodePassword($user, $data->plainPassword));
 
             if ($data->email && $data->email !== $user->getEmail()) {
-                $verificationCode = $upgradeEmail->requestUpgrade($user, $data->email);
-                $mailer->sendUpgradeEmailVerification(new Receiver($user->getName(), $data->email), $verificationCode);
+                $signature = $verifyEmailHelper->generateSignature(
+                    'app_dashboard_verify_new_email',
+                    $user->getId(),
+                    $data->email,
+                    ['new_email' => $data->email]
+                );
+
+                $mailer->sendNewEmailVerification(new Receiver($user->getName(), $data->email), $signature->getSignedUrl());
 
                 $flashBag->add('success', 'Для изменения электронной почты подтвердите новую электронною почту');
             }
