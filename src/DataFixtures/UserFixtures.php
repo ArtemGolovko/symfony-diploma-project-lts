@@ -26,6 +26,7 @@ class UserFixtures extends BaseFixtures
                ->setPassword(
                    $this->passwordEncoder->encodePassword($user, 'query')
                )
+               ->setIsVerified(true)
            ;
            if ($this->faker->boolean(30)) {
                $user
