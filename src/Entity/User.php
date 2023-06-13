@@ -42,9 +42,9 @@ class User implements UserInterface, ReceiverInterface
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="boolean", length=255)
      */
-    private $verificationCode;
+    private $isVerified = false;
 
     /**
      * @ORM\Embedded(class=Subscription::class, columnPrefix="subscription_")
@@ -70,7 +70,7 @@ class User implements UserInterface, ReceiverInterface
     }
 
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -163,23 +163,15 @@ class User implements UserInterface, ReceiverInterface
         return $this;
     }
 
-
-    public function getVerificationCode(): ?string
-    {
-        return $this->verificationCode;
-    }
-
-
-    public function setVerificationCode(?string $verificationCode): self
-    {
-        $this->verificationCode = $verificationCode;
-
-        return $this;
-    }
-
     public function isVerified(): bool
     {
-        return !$this->verificationCode;
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): self
+    {
+        $this->isVerified = $isVerified;
+        return $this;
     }
 
     /**

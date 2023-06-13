@@ -17,15 +17,15 @@ class Mailer
         $this->mailer = $mailer;
     }
 
-    public function sendEmailVerification(ReceiverInterface $sender, string $verificationCode)
+    public function sendEmailVerification(ReceiverInterface $sender, string $signedUrl)
     {
         $this->send(
             'email/email_verification.html.twig',
             'Подтверждение электронной почты',
             $sender,
-            function (TemplatedEmail $email) use ($verificationCode) {
+            function (TemplatedEmail $email) use ($signedUrl) {
                 $email->context([
-                    'verification_code' => $verificationCode
+                    'signed_url' => $signedUrl
                 ]);
             }
         );

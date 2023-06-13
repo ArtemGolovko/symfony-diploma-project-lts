@@ -8,7 +8,6 @@ use App\Event\RegistrationSuccessEvent;
 use App\Form\Model\RegistrationFormModel;
 use App\Form\RegistrationFormType;
 use App\Security\LoginFormAuthenticator;
-use App\Service\VerifyEmailService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -19,6 +18,8 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
+use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 
 class SecurityController extends AbstractController
 {
@@ -83,11 +84,12 @@ class SecurityController extends AbstractController
 
     /**
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
-     * @Route("/verify-email/{verificationCode}",  name="app_verify_email")
+     * @Route("/verify-email",  name="app_verify_email")
      */
-    public function verifyEmail($verificationCode, VerifyEmailService $verifyEmail, Request $request): Response {
+    public function verifyEmail(VerifyEmailHelperInterface $verifyEmailHelper, Request $request): Response {
         /** @var User $user */
         $user = $this->getUser();
+        $em = $this->getDoctrine()->getManager();
 
         if ($user->isVerified()) {
             $path = $this->getTargetPath($request->getSession(), 'main')
@@ -96,17 +98,22 @@ class SecurityController extends AbstractController
             return $this->redirect($path);
         }
 
-        if ($verifyEmail->verifyEmail($user, $verificationCode)) {
-            $path = $this->getTargetPath($request->getSession(), 'main')
-            ?? $this->generateUrl('app_dashboard');
-
-            $this->addFlash('success', 'Регистрация успешно завершена');
-
-            return $this->redirect($path);
+        try {
+            $verifyEmailHelper->validateEmailConfirmation($request->getUri(), $user->getId(), $user->getEmail());
+        } catch (VerifyEmailExceptionInterface $exception) {
+            $this->addFlash('error', 'Неверный код подтверждения email');
+            return $this->redirectToRoute('app_register');
         }
 
-        $this->addFlash('error', 'Неверный код подтверждения email');
-        return $this->redirectToRoute('app_register');
+        $user->setIsVerified(true);
+        $em->flush();
+
+        $path = $this->getTargetPath($request->getSession(), 'main')
+            ?? $this->generateUrl('app_dashboard');
+
+        $this->addFlash('success', 'Регистрация успешно завершена');
+
+        return $this->redirect($path);
     }
 
     /**
