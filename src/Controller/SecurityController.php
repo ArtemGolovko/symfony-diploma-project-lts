@@ -8,6 +8,8 @@ use App\Event\RegistrationSuccessEvent;
 use App\Form\Model\RegistrationFormModel;
 use App\Form\RegistrationFormType;
 use App\Security\LoginFormAuthenticator;
+use App\Service\Verification\Exception\UserAlreadyVerifiedException;
+use App\Service\Verification\VerifyEmailService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -18,8 +20,8 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use SymfonyCasts\Bundle\VerifyEmail\Exception\ExpiredSignatureException;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
-use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 
 class SecurityController extends AbstractController
 {
@@ -86,26 +88,26 @@ class SecurityController extends AbstractController
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      * @Route("/verify-email",  name="app_verify_email")
      */
-    public function verifyEmail(VerifyEmailHelperInterface $verifyEmailHelper, Request $request): Response {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        if ($user->isVerified()) {
+    public function verifyEmail(VerifyEmailService $verifyEmail, Request $request): Response
+    {
+        try {
+            $verifyEmail->verifyEmail($request);
+        } catch (UserAlreadyVerifiedException $exception) {
             $path = $this->getTargetPath($request->getSession(), 'main')
                 ?? $this->generateUrl('app_dashboard');
 
             return $this->redirect($path);
-        }
+        } catch (ExpiredSignatureException $exception) {
+            $verifyEmail->requestVerification();
 
-        try {
-            $verifyEmailHelper->validateEmailConfirmation($request->getUri(), $user->getId(), $user->getEmail());
+            $this->addFlash('error', 'Срок действия кода подверждения вичерпан.');
+            $this->addFlash('success', 'Вам прислан новий код подтверждения.');
+
+            return $this->redirectToRoute('app_register');
         } catch (VerifyEmailExceptionInterface $exception) {
             $this->addFlash('error', 'Неверный код подтверждения email');
             return $this->redirectToRoute('app_register');
         }
-
-        $user->setIsVerified(true);
-        $this->getDoctrine()->getManager()->flush();
 
         $path = $this->getTargetPath($request->getSession(), 'main')
             ?? $this->generateUrl('app_dashboard');
