@@ -3,20 +3,20 @@
 namespace App\EventListener;
 
 use App\Event\RegistrationSuccessEvent;
+use App\Service\RedirectService;
 use App\Service\Verification\VerifyEmailService;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class RegistrationSuccessListener
 {
-    private UrlGeneratorInterface $urlGenerator;
     private VerifyEmailService $verifyEmail;
+    private RedirectService $redirectService;
 
     public function __construct(
         VerifyEmailService $verifyEmail,
-        UrlGeneratorInterface $urlGenerator
+        RedirectService $redirectService
     ) {
-        $this->urlGenerator = $urlGenerator;
         $this->verifyEmail = $verifyEmail;
+        $this->redirectService = $redirectService;
     }
 
     public function onRegistrationSuccess(RegistrationSuccessEvent $event)
@@ -26,7 +26,7 @@ class RegistrationSuccessListener
 
         $session = $event->getRequest()->getSession();
 
-        $session->set('redirect_path', $this->urlGenerator->generate('app_register'));
+        $this->redirectService->setRedirectPathToRoute('app_register');
         $session->getFlashBag()->add('success', 'Для завершения регистрации подтвердите ваш email');
     }
 }

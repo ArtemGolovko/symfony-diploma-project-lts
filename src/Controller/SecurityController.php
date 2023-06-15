@@ -8,6 +8,7 @@ use App\Event\RegistrationSuccessEvent;
 use App\Form\Model\RegistrationFormModel;
 use App\Form\RegistrationFormType;
 use App\Security\LoginFormAuthenticator;
+use App\Service\RedirectService;
 use App\Service\Verification\Exception\UserAlreadyVerifiedException;
 use App\Service\Verification\VerifyEmailService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -25,7 +26,6 @@ use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
 class SecurityController extends AbstractController
 {
-    use TargetPathTrait;
     /**
      * @Route("/login", name="app_login")
      * @IsGranted("IS_ANONYMOUS")
@@ -88,15 +88,12 @@ class SecurityController extends AbstractController
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      * @Route("/verify-email",  name="app_verify_email")
      */
-    public function verifyEmail(VerifyEmailService $verifyEmail, Request $request): Response
+    public function verifyEmail(VerifyEmailService $verifyEmail, Request $request, RedirectService $redirectService): Response
     {
         try {
             $verifyEmail->verifyEmail($request);
         } catch (UserAlreadyVerifiedException $exception) {
-            $path = $this->getTargetPath($request->getSession(), 'main')
-                ?? $this->generateUrl('app_dashboard');
-
-            return $this->redirect($path);
+            return $redirectService->redirectToTargetPath('app_dashboard');
         } catch (ExpiredSignatureException $exception) {
             $verifyEmail->requestVerification();
 
@@ -109,12 +106,9 @@ class SecurityController extends AbstractController
             return $this->redirectToRoute('app_register');
         }
 
-        $path = $this->getTargetPath($request->getSession(), 'main')
-            ?? $this->generateUrl('app_dashboard');
-
         $this->addFlash('success', 'Регистрация успешно завершена');
 
-        return $this->redirect($path);
+        return $redirectService->redirectToTargetPath('app_dashboard');
     }
 
     /**
