@@ -5,9 +5,9 @@ namespace App\Controller\Dashboard;
 use App\Entity\User;
 use App\Form\Model\ProfileFormModel;
 use App\Form\ProfileFormType;
-use App\Service\Mailer\Mailer;
-use App\Service\Mailer\Receiver;
 use App\Service\SubscriptionService;
+use App\Service\Verification\Exception\NewEmailAlreadyVerifiedException;
+use App\Service\Verification\VerifyNewEmailService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,8 +17,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use SymfonyCasts\Bundle\VerifyEmail\Exception\ExpiredSignatureException;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
-use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 
 /**
  * @IsGranted("IS_AUTHENTICATED_AND_VERIFIED")
@@ -84,33 +84,22 @@ class ProfileController extends AbstractController
      */
     public function verifyNewEmail(
         Request $request,
-        VerifyEmailHelperInterface $verifyEmailHelper
+        VerifyNewEmailService $verifyNewEmail
     ): Response {
-        /** @var User $user */
-        $user = $this->getUser();
         $flashBag = $request->getSession()->getFlashBag();
 
-        $newEmail = $request->get('new_email');
-
-        if (null === $newEmail) {
-            $flashBag->add('error', 'Не правильный код подтверждения');
-            return $this->redirectToRoute('app_dashboard_profile');
-        }
-
-        if ($user->getEmail() === $newEmail) {
+        try {
+            $verifyNewEmail->verifyNewEmail($request);
+        } catch (NewEmailAlreadyVerifiedException $exception) {
             $flashBag->add('error', 'Ви уже изминили почту');
             return $this->redirectToRoute('app_dashboard_profile');
-        }
-
-        try {
-            $verifyEmailHelper->validateEmailConfirmation($request->getUri(), $user->getId(), $newEmail);
+        } catch (ExpiredSignatureException $exception) {
+            $this->addFlash('error', 'Срок действия кода подверждения вичерпан.');
+            return $this->redirectToRoute('app_dashboard_profile');
         } catch (VerifyEmailExceptionInterface $exception) {
             $flashBag->add('error', 'Не правильный код подтверждения');
             return $this->redirectToRoute('app_dashboard_profile');
         }
-
-        $user->setEmail($newEmail);
-        $this->getDoctrine()->getManager()->flush();
 
         $flashBag->add('success', 'Email изменен');
 
@@ -123,8 +112,7 @@ class ProfileController extends AbstractController
     public function profile(
         Request                      $request,
         UserPasswordEncoderInterface $passwordEncoder,
-        VerifyEmailHelperInterface   $verifyEmailHelper,
-        Mailer                       $mailer
+        VerifyNewEmailService        $verifyNewEmail
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -143,16 +131,8 @@ class ProfileController extends AbstractController
             if ($data->plainPassword)
                 $user->setPassword($passwordEncoder->encodePassword($user, $data->plainPassword));
 
-            if ($data->email && $data->email !== $user->getEmail()) {
-                $signature = $verifyEmailHelper->generateSignature(
-                    'app_dashboard_verify_new_email',
-                    $user->getId(),
-                    $data->email,
-                    ['new_email' => $data->email]
-                );
-
-                $mailer->sendNewEmailVerification(new Receiver($user->getName(), $data->email), $signature->getSignedUrl());
-
+            if ($data->email) {
+                $verifyNewEmail->requestVerification($data->email);
                 $flashBag->add('success', 'Для изменения электронной почты подтвердите новую электронною почту');
             }
 
