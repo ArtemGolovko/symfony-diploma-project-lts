@@ -18,38 +18,38 @@ class User implements UserInterface, ReceiverInterface
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private ?int $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      */
-    private $email;
+    private ?string $email;
 
     /**
      * @ORM\Column(type="json")
      */
-    private $roles = [];
+    private array $roles = [];
 
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
      */
-    private $password;
+    private ?string $password;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private ?string $name;
 
     /**
      * @ORM\Column(type="boolean", length=255)
      */
-    private $isVerified = false;
+    private bool $isVerified = false;
 
     /**
      * @ORM\Embedded(class=Subscription::class, columnPrefix="subscription_")
      */
-    private $subscription;
+    private Subscription $subscription;
 
     /**
      * @param $subscription

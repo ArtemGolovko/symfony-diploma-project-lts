@@ -12,12 +12,20 @@ class Mailer
 
     private MailerInterface $mailer;
 
+    /**
+     * @param MailerInterface $mailer
+     */
     public function __construct(MailerInterface $mailer)
     {
         $this->mailer = $mailer;
     }
 
-    public function sendEmailVerification(ReceiverInterface $sender, string $signedUrl)
+    /**
+     * @param ReceiverInterface $sender
+     * @param string $signedUrl
+     * @return void
+     */
+    public function sendEmailVerification(ReceiverInterface $sender, string $signedUrl): void
     {
         $this->send(
             'email/email_verification.html.twig',
@@ -31,7 +39,12 @@ class Mailer
         );
     }
 
-    public function sendNewEmailVerification(ReceiverInterface $sender, $signedUrl)
+    /**
+     * @param ReceiverInterface $sender
+     * @param $signedUrl
+     * @return void
+     */
+    public function sendNewEmailVerification(ReceiverInterface $sender, $signedUrl): void
     {
         $this->send(
             'email/new_email_verification.html.twig',
@@ -45,7 +58,15 @@ class Mailer
         );
     }
 
-    private function send(string $template, string $subject, ReceiverInterface $sender, \Closure $callback = null)
+    /**
+     * @param string $template
+     * @param string $subject
+     * @param ReceiverInterface $sender
+     * @param \Closure|null $callback
+     * @return void
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     */
+    private function send(string $template, string $subject, ReceiverInterface $sender, \Closure $callback = null): void
     {
         $email = (new TemplatedEmail())
             ->from(new Address('noreply@blablaarticle.com', 'BlaBlaArticle'))

@@ -19,7 +19,11 @@ class RegistrationSuccessListener
         $this->redirectService = $redirectService;
     }
 
-    public function onRegistrationSuccess(RegistrationSuccessEvent $event)
+    /**
+     * @param RegistrationSuccessEvent $event
+     * @return void
+     */
+    public function onRegistrationSuccess(RegistrationSuccessEvent $event): void
     {
         $user = $event->getUser();
         $this->verifyEmail->requestVerification($user);
