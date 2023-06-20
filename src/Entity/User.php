@@ -18,12 +18,12 @@ class User implements UserInterface, ReceiverInterface
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private ?int $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      */
-    private ?string $email;
+    private string $email;
 
     /**
      * @ORM\Column(type="json")
@@ -34,12 +34,12 @@ class User implements UserInterface, ReceiverInterface
      * @var string The hashed password
      * @ORM\Column(type="string")
      */
-    private ?string $password;
+    private string $password;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private ?string $name;
+    private string $name;
 
     /**
      * @ORM\Column(type="boolean", length=255)
@@ -50,10 +50,7 @@ class User implements UserInterface, ReceiverInterface
      * @ORM\Embedded(class=Subscription::class, columnPrefix="subscription_")
      */
     private Subscription $subscription;
-
-    /**
-     * @param $subscription
-     */
+    
     public function __construct()
     {
         $this->subscription = new Subscription();
