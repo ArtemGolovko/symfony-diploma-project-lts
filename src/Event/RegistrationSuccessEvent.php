@@ -8,8 +8,13 @@ use Symfony\Component\HttpFoundation\Request;
 class RegistrationSuccessEvent
 {
     private User $user;
+
     private Request $request;
 
+    /**
+     * @param User    $user
+     * @param Request $request
+     */
     public function __construct(User $user, Request $request)
     {
         $this->user = $user;

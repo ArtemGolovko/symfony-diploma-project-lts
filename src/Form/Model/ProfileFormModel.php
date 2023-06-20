@@ -8,6 +8,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class ProfileFormModel
 {
+    /**
+     * @param User $user
+     *
+     * @return static
+     */
     public static function fromUser(User $user): self
     {
         $model = new self();

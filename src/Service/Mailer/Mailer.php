@@ -2,14 +2,13 @@
 
 namespace App\Service\Mailer;
 
-use App\Entity\User;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 
 class Mailer
 {
-
     private MailerInterface $mailer;
 
     /**
@@ -22,8 +21,10 @@ class Mailer
 
     /**
      * @param ReceiverInterface $sender
-     * @param string $signedUrl
+     * @param string            $signedUrl
+     *
      * @return void
+     * @throws TransportExceptionInterface
      */
     public function sendEmailVerification(ReceiverInterface $sender, string $signedUrl): void
     {
@@ -33,7 +34,7 @@ class Mailer
             $sender,
             function (TemplatedEmail $email) use ($signedUrl) {
                 $email->context([
-                    'signed_url' => $signedUrl
+                    'signed_url' => $signedUrl,
                 ]);
             }
         );
@@ -41,10 +42,12 @@ class Mailer
 
     /**
      * @param ReceiverInterface $sender
-     * @param $signedUrl
+     * @param string            $signedUrl
+     *
      * @return void
+     * @throws TransportExceptionInterface
      */
-    public function sendNewEmailVerification(ReceiverInterface $sender, $signedUrl): void
+    public function sendNewEmailVerification(ReceiverInterface $sender, string $signedUrl): void
     {
         $this->send(
             'email/new_email_verification.html.twig',
@@ -52,7 +55,7 @@ class Mailer
             $sender,
             function (TemplatedEmail $email) use ($signedUrl) {
                 $email->context([
-                    'signed_url' => $signedUrl
+                    'signed_url' => $signedUrl,
                 ]);
             }
         );
@@ -63,8 +66,9 @@ class Mailer
      * @param string $subject
      * @param ReceiverInterface $sender
      * @param \Closure|null $callback
+     *
      * @return void
-     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     * @throws TransportExceptionInterface
      */
     private function send(string $template, string $subject, ReceiverInterface $sender, \Closure $callback = null): void
     {

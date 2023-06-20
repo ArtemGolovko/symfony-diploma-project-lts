@@ -13,12 +13,20 @@ use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 
 class VerifyEmailService
 {
-
     private VerifyEmailHelperInterface $verifyEmailHelper;
+
     private Mailer $mailer;
+
     private Security $security;
+
     private EntityManagerInterface $entityManager;
 
+    /**
+     * @param VerifyEmailHelperInterface $verifyEmailHelper
+     * @param Mailer                     $mailer
+     * @param Security                   $security
+     * @param EntityManagerInterface     $entityManager
+     */
     public function __construct(
         VerifyEmailHelperInterface $verifyEmailHelper,
         Mailer $mailer,
@@ -31,7 +39,12 @@ class VerifyEmailService
         $this->entityManager = $entityManager;
     }
 
-    public function requestVerification(?User $user = null)
+    /**
+     * @param User|null $user
+     *
+     * @return void
+     */
+    public function requestVerification(?User $user = null): void
     {
         if (null === $user) {
             $user = $this->security->getUser();
@@ -52,16 +65,17 @@ class VerifyEmailService
 
     /**
      * @param Request $request
+     *
      * @return void
      * @throws VerifyEmailExceptionInterface
      */
-    public function verifyEmail(Request $request)
+    public function verifyEmail(Request $request): void
     {
         /** @var User $user */
         $user = $this->security->getUser();
 
         if ($user->isVerified()) {
-            throw new UserAlreadyVerifiedException;
+            throw new UserAlreadyVerifiedException();
         }
 
         $this->verifyEmailHelper->validateEmailConfirmation($request->getUri(), $user->getId(), $user->getEmail());

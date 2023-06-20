@@ -6,16 +6,15 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 class RepeatedPasswordTransformer implements DataTransformerInterface
 {
-
     public function transform($value): array
     {
         return [
             'password' => $value,
-            'confirmPassword' => $value
+            'confirmPassword' => $value,
         ];
     }
 
-    public function reverseTransform($value)
+    public function reverseTransform($value): string
     {
         return $value['password'];
     }

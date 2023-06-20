@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
 use App\Entity\ValueObject\Subscription;
+use App\Repository\UserRepository;
 use App\Service\Mailer\ReceiverInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -50,12 +50,11 @@ class User implements UserInterface, ReceiverInterface
      * @ORM\Embedded(class=Subscription::class, columnPrefix="subscription_")
      */
     private Subscription $subscription;
-    
+
     public function __construct()
     {
         $this->subscription = new Subscription();
     }
-
 
     public function getId(): int
     {
@@ -81,7 +80,7 @@ class User implements UserInterface, ReceiverInterface
      */
     public function getUsername(): string
     {
-        return (string) $this->email;
+        return (string)$this->email;
     }
 
     /**
@@ -158,6 +157,7 @@ class User implements UserInterface, ReceiverInterface
     public function setIsVerified(bool $isVerified): self
     {
         $this->isVerified = $isVerified;
+
         return $this;
     }
 

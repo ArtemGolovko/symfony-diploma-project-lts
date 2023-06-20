@@ -9,8 +9,13 @@ use App\Service\Verification\VerifyEmailService;
 class RegistrationSuccessListener
 {
     private VerifyEmailService $verifyEmail;
+
     private RedirectService $redirectService;
 
+    /**
+     * @param VerifyEmailService $verifyEmail
+     * @param RedirectService    $redirectService
+     */
     public function __construct(
         VerifyEmailService $verifyEmail,
         RedirectService $redirectService
@@ -21,6 +26,7 @@ class RegistrationSuccessListener
 
     /**
      * @param RegistrationSuccessEvent $event
+     *
      * @return void
      */
     public function onRegistrationSuccess(RegistrationSuccessEvent $event): void

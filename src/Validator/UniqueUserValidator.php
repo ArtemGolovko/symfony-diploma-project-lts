@@ -11,6 +11,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 class UniqueUserValidator extends ConstraintValidator
 {
     private UserRepository $userRepository;
+
     private Security $security;
 
     public function __construct(UserRepository $userRepository, Security $security)
@@ -19,7 +20,7 @@ class UniqueUserValidator extends ConstraintValidator
         $this->security = $security;
     }
 
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         /* @var $constraint \App\Validator\UniqueUser */
 
@@ -40,8 +41,8 @@ class UniqueUserValidator extends ConstraintValidator
         }
 
         $this->context->buildViolation($constraint->message)
-            ->setParameter('{{ value }}', $value)
-            ->addViolation();
+                      ->setParameter('{{ value }}', $value)
+                      ->addViolation()
+        ;
     }
-
 }

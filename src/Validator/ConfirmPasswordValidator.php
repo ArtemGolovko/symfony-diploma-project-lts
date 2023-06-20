@@ -2,7 +2,6 @@
 
 namespace App\Validator;
 
-use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -12,7 +11,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ConfirmPasswordValidator extends ConstraintValidator
 {
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof ConfirmPassword) {
             throw new UnexpectedTypeException($constraint, ConfirmPassword::class);
@@ -32,6 +31,7 @@ class ConfirmPasswordValidator extends ConstraintValidator
         }
 
         $this->context->buildViolation($constraint->message)
-            ->addViolation();
+                      ->addViolation()
+        ;
     }
 }
