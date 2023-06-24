@@ -3,7 +3,7 @@
 namespace App\Security;
 
 use App\Repository\UserRepository;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use App\Service\RedirectService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -15,29 +15,29 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
-use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
 {
-    use TargetPathTrait;
-
     public const LOGIN_ROUTE = 'app_login';
 
     private UserRepository $userRepository;
     private UrlGeneratorInterface $urlGenerator;
     private CsrfTokenManagerInterface $csrfTokenManager;
     private UserPasswordEncoderInterface $passwordEncoder;
+    private RedirectService $redirectService;
 
     public function __construct(
         UserRepository $userRepository,
         UrlGeneratorInterface $urlGenerator,
         CsrfTokenManagerInterface $csrfTokenManager,
-        UserPasswordEncoderInterface $passwordEncoder
+        UserPasswordEncoderInterface $passwordEncoder,
+        RedirectService $redirectService
     ) {
         $this->userRepository = $userRepository;
         $this->urlGenerator = $urlGenerator;
         $this->csrfTokenManager = $csrfTokenManager;
         $this->passwordEncoder = $passwordEncoder;
+        $this->redirectService = $redirectService;
     }
 
     protected function getLoginUrl()
@@ -95,12 +95,6 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
         $session = $request->getSession();
         $session->remove('remember_me');
 
-        $path = $session->get('redirect_path');
-        if (!$path) {
-            $path = $this->getTargetPath($session, 'main')
-                ?? $this->urlGenerator->generate('app_dashboard');
-        }
-
-        return new RedirectResponse($path);
+        return $this->redirectService->redirectToRedirectPath('app_dashboard');
     }
 }

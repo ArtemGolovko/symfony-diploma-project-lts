@@ -4,10 +4,10 @@
     <p class="paragraph">Добрый день, {{ email.toName }}, для изменения электронной почты подтвердите новую электронною почту.</p>
     <center>
         <center class="verify-button-center">
-            <a class="verify-link" href="{{ url('app_dashboard_verify_upgrade_email', { verificationCode: verification_code }) }}" target="_blank">Изменить почту</a>
+            <a class="verify-link" href="{{ signed_url }}" target="_blank">Изменить почту</a>
         </center>
     </center>
     <p class="paragraph">Не сработало? Перейдите по ссылке ниже. <br />
-        <a class="link" href="{{ url('app_dashboard_verify_upgrade_email', { verificationCode: verification_code }) }}" target="_blank">{{ url('app_dashboard_verify_upgrade_email', { verificationCode: verification_code }) }}</a>
+        <a class="link" href="{{ signed_url }}" target="_blank">{{ signed_url }}</a>
     </p>
 {% endblock %}

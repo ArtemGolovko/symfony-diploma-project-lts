@@ -16,5 +16,5 @@ final class AppEvents
      *
      * @Event("App\Event\RegistrationSuccessEvent")
      */
-    const REGISTRATION_SUCCESS = 'app.registration_success';
+    public const REGISTRATION_SUCCESS = 'app.registration_success';
 }

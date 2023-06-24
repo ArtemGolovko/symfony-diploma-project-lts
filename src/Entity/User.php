@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
 use App\Entity\ValueObject\Subscription;
+use App\Repository\UserRepository;
 use App\Service\Mailer\ReceiverInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -18,59 +18,45 @@ class User implements UserInterface, ReceiverInterface
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      */
-    private $email;
+    private string $email;
 
     /**
      * @ORM\Column(type="json")
      */
-    private $roles = [];
+    private array $roles = [];
 
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
      */
-    private $password;
+    private string $password;
 
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    private string $name;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="boolean", length=255)
      */
-    private $verificationCode;
+    private bool $isVerified = false;
 
     /**
      * @ORM\Embedded(class=Subscription::class, columnPrefix="subscription_")
      */
-    private $subscription;
+    private Subscription $subscription;
 
-    /**
-     * @ORM\Column(type="string", length=180, nullable=true)
-     */
-    private $upgradeEmail;
-
-    /**
-     * @ORM\Column(type="string", length=255, nullable=true)
-     */
-    private $upgradeEmailVerificationCode;
-
-    /**
-     * @param $subscription
-     */
     public function __construct()
     {
         $this->subscription = new Subscription();
     }
 
-
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -94,7 +80,7 @@ class User implements UserInterface, ReceiverInterface
      */
     public function getUsername(): string
     {
-        return (string) $this->email;
+        return (string)$this->email;
     }
 
     /**
@@ -163,23 +149,16 @@ class User implements UserInterface, ReceiverInterface
         return $this;
     }
 
-
-    public function getVerificationCode(): ?string
-    {
-        return $this->verificationCode;
-    }
-
-
-    public function setVerificationCode(?string $verificationCode): self
-    {
-        $this->verificationCode = $verificationCode;
-
-        return $this;
-    }
-
     public function isVerified(): bool
     {
-        return !$this->verificationCode;
+        return $this->isVerified;
+    }
+
+    public function setIsVerified(bool $isVerified): self
+    {
+        $this->isVerified = $isVerified;
+
+        return $this;
     }
 
     /**
@@ -188,29 +167,5 @@ class User implements UserInterface, ReceiverInterface
     public function getSubscription(): Subscription
     {
         return $this->subscription;
-    }
-
-    public function getUpgradeEmail(): ?string
-    {
-        return $this->upgradeEmail;
-    }
-
-    public function setUpgradeEmail(?string $upgradeEmail): self
-    {
-        $this->upgradeEmail = $upgradeEmail;
-
-        return $this;
-    }
-
-    public function getUpgradeEmailVerificationCode(): ?string
-    {
-        return $this->upgradeEmailVerificationCode;
-    }
-
-    public function setUpgradeEmailVerificationCode(?string $upgradeEmailVerificationCode): self
-    {
-        $this->upgradeEmailVerificationCode = $upgradeEmailVerificationCode;
-
-        return $this;
     }
 }
