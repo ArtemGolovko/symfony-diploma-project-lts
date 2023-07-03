@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Entity\ValueObject\Subscription;
 use App\Repository\UserRepository;
 use App\Service\Mailer\ReceiverInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -51,9 +53,15 @@ class User implements UserInterface, ReceiverInterface
      */
     private Subscription $subscription;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Article::class, mappedBy="author", orphanRemoval=true)
+     */
+    private $articles;
+
     public function __construct()
     {
         $this->subscription = new Subscription();
+        $this->articles = new ArrayCollection();
     }
 
     public function getId(): int
@@ -167,5 +175,32 @@ class User implements UserInterface, ReceiverInterface
     public function getSubscription(): Subscription
     {
         return $this->subscription;
+    }
+
+    /**
+     * @return Collection<int, Article>
+     */
+    public function getArticles(): Collection
+    {
+        return $this->articles;
+    }
+
+    public function addArticle(Article $article): self
+    {
+        if (!$this->articles->contains($article)) {
+            $this->articles[] = $article;
+            $article->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeArticle(Article $article): self
+    {
+        if ($this->articles->contains($article)) {
+            $this->articles->removeElement($article);
+        }
+
+        return $this;
     }
 }

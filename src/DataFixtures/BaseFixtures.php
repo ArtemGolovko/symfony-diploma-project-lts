@@ -10,6 +10,7 @@ use Faker\Generator;
 abstract class BaseFixtures extends Fixture
 {
     protected Generator $faker;
+
     protected ObjectManager $manager;
 
     public function load(ObjectManager $manager): void
@@ -18,6 +19,8 @@ abstract class BaseFixtures extends Fixture
         $this->manager = $manager;
 
         $this->loadData($this->manager);
+
+        $manager->flush();
     }
 
     abstract function loadData(ObjectManager $manager);
@@ -35,8 +38,28 @@ abstract class BaseFixtures extends Fixture
     protected function createMany(string $className, int $quantity, callable $factory)
     {
         for ($i = 0; $i < $quantity; $i++) {
-            $this->create($className, $factory);
+            $entity = $this->create($className, $factory);
+
+            $this->addReference($className . '|' . $i, $entity);
         }
-        $this->manager->flush();
+    }
+
+    protected function getRandomReference($className)
+    {
+        if (!isset($this->referencesIndex[$className])) {
+            $this->referencesIndex[$className] = [];
+
+            foreach ($this->referenceRepository->getReferences() as $key => $reference) {
+                if (strpos($key, $className . '|') === 0) {
+                    $this->referencesIndex[$className][] = $key;
+                }
+            }
+        }
+
+        if (empty($this->referencesIndex[$className])) {
+            throw new \Exception('Не найдены ссылки на класс: ' . $className);
+        }
+
+        return $this->getReference($this->faker->randomElement($this->referencesIndex[$className]));
     }
 }
