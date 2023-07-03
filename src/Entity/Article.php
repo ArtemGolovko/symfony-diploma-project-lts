@@ -23,13 +23,9 @@ class Article
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Length(max=255)
      */
     private string $title;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private string $description;
 
     /**
      * @ORM\Column(type="text")
@@ -66,18 +62,6 @@ class Article
     public function setTitle(string $title): self
     {
         $this->title = $title;
-
-        return $this;
-    }
-
-    public function getDescription(): string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(string $description): self
-    {
-        $this->description = $description;
 
         return $this;
     }

@@ -13,6 +13,7 @@ class ArticleGenerateOptions
 {
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Length(max=255)
      */
     private string $theme;
 
@@ -25,6 +26,7 @@ class ArticleGenerateOptions
 
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
+     * @Assert\Length(max=255)
      */
     private ?string $title;
 

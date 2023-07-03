@@ -20,7 +20,6 @@ class ArticleFixtures extends BaseFixtures implements DependentFixtureInterface
 
             $article
                 ->setTitle($this->faker->sentence)
-                ->setDescription($this->faker->text(255))
                 ->setContent($this->faker->paragraphs(5, true))
                 ->setAuthor($author)
                 ->setGenerateOptions($this->getGenerateOptions())
