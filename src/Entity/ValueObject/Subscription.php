@@ -3,6 +3,7 @@
 namespace App\Entity\ValueObject;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Embeddable
@@ -16,6 +17,7 @@ class Subscription
 
     /**
      * @ORM\Column(type="string", length=4)
+     * @Assert\Choice(choices=Subscription::HIERARCHY)
      */
     private string $level = self::HIERARCHY[0];
 
@@ -53,10 +55,6 @@ class Subscription
      */
     public function setLevel(string $level, ?\DateTimeImmutable $expiresAt = null): self
     {
-        if (!in_array($level, self::HIERARCHY)) {
-            throw new \InvalidArgumentException('Invalid level.');
-        }
-
         if (self::HIERARCHY[0] !== $level && null === $expiresAt) {
             throw new \InvalidArgumentException("Cannot set level {$level} with unlimited lifetime");
         }

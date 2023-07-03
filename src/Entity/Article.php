@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Entity\ValueObject\ArticleGenerateOptions;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=ArticleRepository::class)
@@ -43,6 +44,7 @@ class Article
 
     /**
      * @ORM\Embedded(class=ArticleGenerateOptions::class, columnPrefix="generate_options_")
+     * @Assert\Valid
      */
     private ArticleGenerateOptions $generateOptions;
 

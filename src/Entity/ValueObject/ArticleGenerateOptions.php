@@ -4,6 +4,7 @@ namespace App\Entity\ValueObject;
 
 use App\Entity\Dto\PromotedWord;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Embeddable
@@ -17,6 +18,7 @@ class ArticleGenerateOptions
 
     /**
      * @ORM\Column(type="simple_array")
+     * @Assert\Count(min=1, max=6)
      * @var string[]
      */
     private array $keywords;
@@ -28,6 +30,7 @@ class ArticleGenerateOptions
 
     /**
      * @ORM\Embedded(class=Range::class, columnPrefix="size_")
+     * @Assert\Valid
      */
     private Range $size;
 
@@ -39,6 +42,7 @@ class ArticleGenerateOptions
 
     /**
      * @ORM\Column(type="simple_array", nullable=true)
+     * @Assert\Count(max=5)
      * @var string[]
      */
     private array $images;

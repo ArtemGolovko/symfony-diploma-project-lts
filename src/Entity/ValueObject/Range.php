@@ -3,6 +3,7 @@
 namespace App\Entity\ValueObject;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Embeddable
@@ -11,6 +12,7 @@ class Range
 {
     /**
      * @ORM\Column(type="smallint")
+     * @Assert\LessThanOrEqual(propertyPath="end")
      */
     private int $begin;
 
@@ -27,10 +29,6 @@ class Range
      */
     public function __construct(int $begin, ?int $end = null)
     {
-        if ($begin > $end) {
-            throw new \InvalidArgumentException('Beginning of range cannot be bigger ending of range.');
-        }
-
         $this->begin = $begin;
         $this->end = $end ?? $begin;
     }
@@ -60,10 +58,6 @@ class Range
      */
     public function set(int $begin, ?int $end = null): void
     {
-        if ($begin > $end) {
-            throw new \InvalidArgumentException('Beginning of range cannot be bigger ending of range.');
-        }
-
         $this->begin = $begin;
         $this->end = $end ?? $begin;
     }
