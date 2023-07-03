@@ -47,7 +47,7 @@ class Article
     /**
      * @ORM\Column(type="datetime_immutable")
      */
-    private \DateTimeImmutable $created_at;
+    private \DateTimeImmutable $createdAt;
 
     public function getId(): int
     {
@@ -112,7 +112,7 @@ class Article
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
     /**
@@ -120,6 +120,6 @@ class Article
      */
     public function setCreatedAt(): void
     {
-        $this->created_at = new \DateTimeImmutable();
+        $this->createdAt = new \DateTimeImmutable();
     }
 }

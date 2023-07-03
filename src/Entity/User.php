@@ -59,10 +59,16 @@ class User implements UserInterface, ReceiverInterface
      */
     private $articles;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Module::class, mappedBy="author", orphanRemoval=true)
+     */
+    private $modules;
+
     public function __construct()
     {
         $this->subscription = new Subscription();
         $this->articles = new ArrayCollection();
+        $this->modules = new ArrayCollection();
     }
 
     public function getId(): int
@@ -200,6 +206,33 @@ class User implements UserInterface, ReceiverInterface
     {
         if ($this->articles->contains($article)) {
             $this->articles->removeElement($article);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Module>
+     */
+    public function getModules(): Collection
+    {
+        return $this->modules;
+    }
+
+    public function addModule(Module $module): self
+    {
+        if (!$this->modules->contains($module)) {
+            $this->modules[] = $module;
+            $module->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeModule(Module $module): self
+    {
+        if ($this->modules->contains($module)) {
+            $this->removeModule($module);
         }
 
         return $this;
