@@ -126,7 +126,7 @@ class Module
     /**
      * @ORM\PrePersist
      */
-    private function setCreatedAt(): void
+    public function setCreatedAt(): void
     {
         $this->createdAt = new \DateTimeImmutable();
     }

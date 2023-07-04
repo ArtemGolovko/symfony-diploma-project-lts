@@ -62,15 +62,15 @@ class User implements UserInterface, ReceiverInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Article::class, mappedBy="author", orphanRemoval=true)
-     * @var ArrayCollection<int, Article>
+     * @var Collection<int, Article>
      */
-    private ArrayCollection $articles;
+    private Collection $articles;
 
     /**
      * @ORM\OneToMany(targetEntity=Module::class, mappedBy="author", orphanRemoval=true)
-     * @var ArrayCollection<int, Module>
+     * @var Collection<int, Module>
      */
-    private ArrayCollection $modules;
+    private Collection $modules;
 
     public function __construct()
     {

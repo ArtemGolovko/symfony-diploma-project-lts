@@ -18,7 +18,7 @@ class Article
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @avr int
+     * @var int
      */
     private int $id;
 
@@ -31,7 +31,7 @@ class Article
 
     /**
      * @ORM\Column(type="text")
-     * @avr string
+     * @var string
      */
     private string $content;
 
@@ -154,7 +154,7 @@ class Article
     /**
      * @ORM\PrePersist
      */
-    private function setCreatedAt(): void
+    public function setCreatedAt(): void
     {
         $this->createdAt = new \DateTimeImmutable();
     }
