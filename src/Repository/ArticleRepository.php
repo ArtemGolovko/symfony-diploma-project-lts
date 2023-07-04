@@ -18,12 +18,18 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class ArticleRepository extends ServiceEntityRepository
 {
+    /**
+     * @param ManagerRegistry $registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Article::class);
     }
 
     /**
+     * @param Article $entity
+     * @param bool    $flush
+     *
      * @throws ORMException
      * @throws OptimisticLockException
      */
@@ -36,6 +42,10 @@ class ArticleRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param Article $entity
+     * @param bool    $flush
+     *
+     * @return void
      * @throws ORMException
      * @throws OptimisticLockException
      */

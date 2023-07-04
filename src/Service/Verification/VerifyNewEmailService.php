@@ -8,6 +8,7 @@ use App\Service\Mailer\Receiver;
 use App\Service\Verification\Exception\NewEmailAlreadyVerifiedException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Security\Core\Security;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\InvalidSignatureException;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
@@ -15,12 +16,24 @@ use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 
 class VerifyNewEmailService
 {
+    /**
+     * @var VerifyEmailHelperInterface
+     */
     private VerifyEmailHelperInterface $verifyEmailHelper;
 
+    /**
+     * @var Mailer
+     */
     private Mailer $mailer;
 
+    /**
+     * @var Security
+     */
     private Security $security;
 
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
 
     /**
@@ -45,6 +58,7 @@ class VerifyNewEmailService
      * @param string $newEmail
      *
      * @return void
+     * @throws TransportExceptionInterface
      */
     public function requestVerification(string $newEmail): void
     {

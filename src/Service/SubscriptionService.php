@@ -8,6 +8,9 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class SubscriptionService
 {
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $em;
 
     /**

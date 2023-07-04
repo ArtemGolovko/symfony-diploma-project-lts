@@ -67,17 +67,17 @@ class PromotedWord implements \Serializable
     /**
      * @return string
      */
-    public function serialize()
+    public function serialize(): string
     {
         return $this->repetitions . ":" . $this->word;
     }
 
     /**
-     * @param $data
+     * @param string $data
      *
      * @return void
      */
-    public function unserialize($data)
+    public function unserialize($data): void
     {
         sscanf($data, "%d:%s", $this->repetitions, $this->word);
     }

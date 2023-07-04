@@ -17,72 +17,107 @@ class Module
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @var int
      */
     private int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Length(max=255)
+     * @var string
      */
     private string $name;
 
     /**
      * @ORM\Column(type="text")
+     * @var string
      */
     private string $template;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="modules")
      * @ORM\JoinColumn(nullable=false)
+     * @var User
      */
     private User $author;
 
     /**
      * @ORM\Column(type="datetime_immutable")
+     * @var \DateTimeImmutable
      */
     private \DateTimeImmutable $createdAt;
 
+    /**
+     * @return int
+     */
     public function getId(): int
     {
         return $this->id;
     }
 
+    /**
+     * @return string
+     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    public function setName(string $name): self
+    /**
+     * @param string $name
+     *
+     * @return $this
+     */
+    public function setName(string $name): Module
     {
         $this->name = $name;
 
         return $this;
     }
 
-    public function getTemplate(): ?string
+    /**
+     * @return string
+     */
+    public function getTemplate(): string
     {
         return $this->template;
     }
 
-    public function setTemplate(string $template): self
+    /**
+     * @param string $template
+     *
+     * @return $this
+     */
+    public function setTemplate(string $template): Module
     {
         $this->template = $template;
 
         return $this;
     }
 
+    /**
+     * @return User
+     */
     public function getAuthor(): User
     {
         return $this->author;
     }
 
-    public function setAuthor(User $author): self
+    /**
+     * @param User $author
+     *
+     * @return Module
+     */
+    public function setAuthor(User $author): Module
     {
         $this->author = $author;
 
         return $this;
     }
 
+    /**
+     * @return \DateTimeImmutable|null
+     */
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
@@ -91,7 +126,7 @@ class Module
     /**
      * @ORM\PrePersist
      */
-    public function setCreatedAt(): void
+    private function setCreatedAt(): void
     {
         $this->createdAt = new \DateTimeImmutable();
     }

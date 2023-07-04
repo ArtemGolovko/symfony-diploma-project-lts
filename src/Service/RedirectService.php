@@ -14,8 +14,14 @@ class RedirectService
     private const PROVIDER_KEY = 'main';
     private const REDIRECT_PATH_KEY = 'redirect_path';
 
+    /**
+     * @var SessionInterface
+     */
     private SessionInterface $session;
 
+    /**
+     * @var UrlGeneratorInterface
+     */
     private UrlGeneratorInterface $urlGenerator;
 
     /**

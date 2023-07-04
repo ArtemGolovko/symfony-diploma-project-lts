@@ -13,11 +13,13 @@ class Range
     /**
      * @ORM\Column(type="smallint")
      * @Assert\LessThanOrEqual(propertyPath="end")
+     * @var int
      */
     private int $begin;
 
     /**
      * @ORM\Column(type="smallint")
+     * @var int
      */
     private int $end;
 

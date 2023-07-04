@@ -12,7 +12,12 @@ use Doctrine\Persistence\ObjectManager;
 
 class ArticleFixtures extends BaseFixtures implements DependentFixtureInterface
 {
-    function loadData(ObjectManager $manager)
+    /**
+     * @param ObjectManager $manager
+     *
+     * @return void
+     */
+    protected function loadData(ObjectManager $manager): void
     {
         $this->createMany(Article::class, 30, function (Article $article) {
             /** @var User $author */
@@ -30,7 +35,7 @@ class ArticleFixtures extends BaseFixtures implements DependentFixtureInterface
     /**
      * @return ArticleGenerateOptions
      */
-    function getGenerateOptions(): ArticleGenerateOptions
+    private function getGenerateOptions(): ArticleGenerateOptions
     {
         return new ArticleGenerateOptions(
             $this->faker->word,
@@ -45,7 +50,7 @@ class ArticleFixtures extends BaseFixtures implements DependentFixtureInterface
     /**
      * @return Range
      */
-    function getRange(): Range
+    private function getRange(): Range
     {
         $begin = $this->faker->numberBetween(1, 3);
         $end = $this->faker->numberBetween($begin, 6);
@@ -54,9 +59,9 @@ class ArticleFixtures extends BaseFixtures implements DependentFixtureInterface
     }
 
     /**
-     * @return array
+     * @return PromotedWord[]
      */
-    function getPromotedWords(): array
+    private function getPromotedWords(): array
     {
         $promotedWords = [];
         $quantity = $this->faker->numberBetween(1, 5);
@@ -68,7 +73,10 @@ class ArticleFixtures extends BaseFixtures implements DependentFixtureInterface
         return $promotedWords;
     }
 
-    function getImages(): array
+    /**
+     * @return string[]
+     */
+    private function getImages(): array
     {
         $images = [];
         $quantity = $this->faker->numberBetween(0, 5);
@@ -80,7 +88,10 @@ class ArticleFixtures extends BaseFixtures implements DependentFixtureInterface
         return $images;
     }
 
-    public function getDependencies()
+    /**
+     * @return string[]
+     */
+    public function getDependencies(): array
     {
         return [
             UserFixtures::class,

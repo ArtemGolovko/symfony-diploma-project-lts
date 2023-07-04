@@ -13,13 +13,25 @@ use Symfony\Component\Security\Http\Authorization\AccessDeniedHandlerInterface;
 
 class AccessDeniedHandler implements AccessDeniedHandlerInterface
 {
+    /**
+     * @var UrlGeneratorInterface
+     */
     private UrlGeneratorInterface $urlGenerator;
 
+    /**
+     * @param UrlGeneratorInterface $urlGenerator
+     */
     public function __construct(UrlGeneratorInterface $urlGenerator)
     {
         $this->urlGenerator = $urlGenerator;
     }
 
+    /**
+     * @param Request               $request
+     * @param AccessDeniedException $accessDeniedException
+     *
+     * @return Response|null
+     */
     public function handle(Request $request, AccessDeniedException $accessDeniedException): ?Response
     {
         $attributes = $accessDeniedException->getAttributes();
@@ -44,14 +56,21 @@ class AccessDeniedHandler implements AccessDeniedHandlerInterface
         if (in_array(UserVerifiedVoter::IS_ANONYMOUS_OR_UNVERIFIED, $attributes)) {
             return $this->createResponse(
                 $request,
-            'Страница не доступна для авторизованых пользователей и тех кто подвердили свой email.',
-            'app_dashboard'
+                'Страница не доступна для авторизованых пользователей и тех кто подвердили свой email.',
+                'app_dashboard'
             );
         }
 
         return null;
     }
 
+    /**
+     * @param Request $request
+     * @param string  $message
+     * @param string  $redirectPath
+     *
+     * @return Response
+     */
     public function createResponse(Request $request, string $message, string $redirectPath): Response
     {
         $request

@@ -20,7 +20,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\ExpiredSignatureException;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
@@ -29,6 +28,9 @@ class SecurityController extends AbstractController
     /**
      * @Route("/login", name="app_login")
      * @IsGranted("IS_ANONYMOUS")
+     * @param AuthenticationUtils $authenticationUtils
+     *
+     * @return Response
      */
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -38,13 +40,20 @@ class SecurityController extends AbstractController
 
         return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,
-            'error' => $error
+            'error' => $error,
         ]);
     }
 
     /**
      * @Route("/register", name="app_register")
      * @IsGranted("IS_ANONYMOUS_OR_UNVERIFIED")
+     * @param Request $request
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param GuardAuthenticatorHandler $guard
+     * @param LoginFormAuthenticator $authenticator
+     * @param EventDispatcherInterface $dispatcher
+     *
+     * @return Response
      */
     public function register(
         Request $request,
@@ -80,16 +89,24 @@ class SecurityController extends AbstractController
 
         return $this->render('security/register.html.twig', [
             'form' => $form->createView(),
-            'error' => ''
+            'error' => '',
         ]);
     }
 
     /**
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      * @Route("/verify-email",  name="app_verify_email")
+     * @param VerifyEmailService $verifyEmail
+     * @param Request            $request
+     * @param RedirectService    $redirectService
+     *
+     * @return Response
      */
-    public function verifyEmail(VerifyEmailService $verifyEmail, Request $request, RedirectService $redirectService): Response
-    {
+    public function verifyEmail(
+        VerifyEmailService $verifyEmail,
+        Request $request,
+        RedirectService $redirectService
+    ): Response {
         try {
             $verifyEmail->verifyEmail($request);
         } catch (UserAlreadyVerifiedException $exception) {
@@ -103,6 +120,7 @@ class SecurityController extends AbstractController
             return $this->redirectToRoute('app_register');
         } catch (VerifyEmailExceptionInterface $exception) {
             $this->addFlash('error', 'Неверный код подтверждения email');
+
             return $this->redirectToRoute('app_register');
         }
 
@@ -113,9 +131,12 @@ class SecurityController extends AbstractController
 
     /**
      * @Route("/logout", name="app_logout")
+     * @throws \LogicException
      */
     public function logout()
     {
-        throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+        throw new \LogicException(
+            'This method can be blank - it will be intercepted by the logout key on your firewall.'
+        );
     }
 }

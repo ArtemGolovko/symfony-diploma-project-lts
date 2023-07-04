@@ -2,9 +2,11 @@
 
 namespace App\Security;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\RedirectService;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -20,12 +22,38 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
 {
     public const LOGIN_ROUTE = 'app_login';
 
+    /**
+     * @var UserRepository
+     */
     private UserRepository $userRepository;
+
+    /**
+     * @var UrlGeneratorInterface
+     */
     private UrlGeneratorInterface $urlGenerator;
+
+    /**
+     * @var CsrfTokenManagerInterface
+     */
     private CsrfTokenManagerInterface $csrfTokenManager;
+
+    /**
+     * @var UserPasswordEncoderInterface
+     */
     private UserPasswordEncoderInterface $passwordEncoder;
+
+    /**
+     * @var RedirectService
+     */
     private RedirectService $redirectService;
 
+    /**
+     * @param UserRepository               $userRepository
+     * @param UrlGeneratorInterface        $urlGenerator
+     * @param CsrfTokenManagerInterface    $csrfTokenManager
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param RedirectService              $redirectService
+     */
     public function __construct(
         UserRepository $userRepository,
         UrlGeneratorInterface $urlGenerator,
@@ -40,24 +68,37 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
         $this->redirectService = $redirectService;
     }
 
-    protected function getLoginUrl()
+    /**
+     * @return string
+     */
+    protected function getLoginUrl(): string
     {
         return $this->urlGenerator->generate(self::LOGIN_ROUTE);
     }
 
-    public function supports(Request $request)
+    /**
+     * @param Request $request
+     *
+     * @return bool
+     */
+    public function supports(Request $request): bool
     {
         return
             $request->attributes->get('_route') === self::LOGIN_ROUTE
             && $request->isMethod(Request::METHOD_POST);
     }
 
-    public function getCredentials(Request $request)
+    /**
+     * @param Request $request
+     *
+     * @return array
+     */
+    public function getCredentials(Request $request): array
     {
         $credentials = [
             'email' => $request->request->get('email'),
             'password' => $request->request->get('password'),
-            'csrf_token' => $request->request->get('_csrf_token')
+            'csrf_token' => $request->request->get('_csrf_token'),
         ];
 
         $session = $request->getSession();
@@ -75,7 +116,14 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
         return $credentials;
     }
 
-    public function getUser($credentials, UserProviderInterface $userProvider)
+    /**
+     * @param string[]              $credentials
+     * @param UserProviderInterface $userProvider
+     *
+     * @return User
+     * @throws InvalidCsrfTokenException
+     */
+    public function getUser($credentials, UserProviderInterface $userProvider): User
     {
         $csrfToken = new CsrfToken('authenticate', $credentials['csrf_token']);
         if (!$this->csrfTokenManager->isTokenValid($csrfToken)) {
@@ -85,12 +133,25 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
         return $this->userRepository->findOneBy(['email' => $credentials['email']]);
     }
 
-    public function checkCredentials($credentials, UserInterface $user)
+    /**
+     * @param string[]      $credentials
+     * @param UserInterface $user
+     *
+     * @return bool
+     */
+    public function checkCredentials($credentials, UserInterface $user): bool
     {
         return $this->passwordEncoder->isPasswordValid($user, $credentials['password']);
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
+    /**
+     * @param Request        $request
+     * @param TokenInterface $token
+     * @param string         $providerKey
+     *
+     * @return Response|null
+     */
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
     {
         $session = $request->getSession();
         $session->remove('remember_me');

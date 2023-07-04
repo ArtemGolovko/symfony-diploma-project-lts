@@ -18,72 +18,105 @@ class Article
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @avr int
      */
     private int $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Length(max=255)
+     * @var string
      */
     private string $title;
 
     /**
      * @ORM\Column(type="text")
+     * @avr string
      */
     private string $content;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="articles")
      * @ORM\JoinColumn(nullable=false)
+     * @var User
      */
     private User $author;
 
     /**
      * @ORM\Embedded(class=ArticleGenerateOptions::class, columnPrefix="generate_options_")
      * @Assert\Valid
+     * @var ArticleGenerateOptions
      */
     private ArticleGenerateOptions $generateOptions;
 
     /**
      * @ORM\Column(type="datetime_immutable")
+     * @var \DateTimeImmutable
      */
     private \DateTimeImmutable $createdAt;
 
+    /**
+     * @return int
+     */
     public function getId(): int
     {
         return $this->id;
     }
 
+    /**
+     * @return string
+     */
     public function getTitle(): string
     {
         return $this->title;
     }
 
-    public function setTitle(string $title): self
+    /**
+     * @param string $title
+     *
+     * @return Article
+     */
+    public function setTitle(string $title): Article
     {
         $this->title = $title;
 
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getContent(): string
     {
         return $this->content;
     }
 
-    public function setContent(string $content): self
+    /**
+     * @param string $content
+     *
+     * @return Article
+     */
+    public function setContent(string $content): Article
     {
         $this->content = $content;
 
         return $this;
     }
 
+    /**
+     * @return User
+     */
     public function getAuthor(): User
     {
         return $this->author;
     }
 
-    public function setAuthor(User $author): self
+    /**
+     * @param User $author
+     *
+     * @return Article
+     */
+    public function setAuthor(User $author): Article
     {
         $this->author = $author;
 
@@ -110,6 +143,9 @@ class Article
         return $this;
     }
 
+    /**
+     * @return \DateTimeImmutable|null
+     */
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
@@ -118,7 +154,7 @@ class Article
     /**
      * @ORM\PrePersist
      */
-    public function setCreatedAt(): void
+    private function setCreatedAt(): void
     {
         $this->createdAt = new \DateTimeImmutable();
     }
