@@ -12,11 +12,11 @@ class Theme
     public string $name;
 
     /**
-     * @var string[]
      * @Assert\All(constraints={
      *  @Assert\NotBlank
      *  @Assert\Length(max=255)
      * })
+     * @var string[]
      */
     public array $titles;
 

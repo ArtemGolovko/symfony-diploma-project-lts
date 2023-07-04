@@ -14,6 +14,7 @@ class ArticleGenerateOptions
     /**
      * @ORM\Column(type="string", length=255)
      * @Assert\Length(max=255)
+     * @var string
      */
     private string $theme;
 
@@ -27,12 +28,14 @@ class ArticleGenerateOptions
     /**
      * @ORM\Column(type="string", length=255, nullable=true)
      * @Assert\Length(max=255)
+     * @var string|null
      */
     private ?string $title;
 
     /**
      * @ORM\Embedded(class=Range::class, columnPrefix="size_")
      * @Assert\Valid
+     * @var Range
      */
     private Range $size;
 
@@ -86,7 +89,7 @@ class ArticleGenerateOptions
      *
      * @return ArticleGenerateOptions
      */
-    public function setTheme(string $theme): self
+    public function setTheme(string $theme): ArticleGenerateOptions
     {
         $this->theme = $theme;
 
@@ -94,7 +97,7 @@ class ArticleGenerateOptions
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getKeywords(): array
     {
@@ -102,11 +105,11 @@ class ArticleGenerateOptions
     }
 
     /**
-     * @param array $keywords
+     * @param string[] $keywords
      *
      * @return ArticleGenerateOptions
      */
-    public function setKeywords(array $keywords): self
+    public function setKeywords(array $keywords): ArticleGenerateOptions
     {
         $this->keywords = $keywords;
 
@@ -126,7 +129,7 @@ class ArticleGenerateOptions
      *
      * @return ArticleGenerateOptions
      */
-    public function setTitle(?string $title): self
+    public function setTitle(?string $title): ArticleGenerateOptions
     {
         $this->title = $title;
 
@@ -142,7 +145,7 @@ class ArticleGenerateOptions
     }
 
     /**
-     * @return array
+     * @return PromotedWord[]
      */
     public function getPromotedWords(): array
     {
@@ -150,11 +153,11 @@ class ArticleGenerateOptions
     }
 
     /**
-     * @param array $promotedWords
+     * @param PromotedWord[] $promotedWords
      *
      * @return ArticleGenerateOptions
      */
-    public function setPromotedWords(array $promotedWords): self
+    public function setPromotedWords(array $promotedWords): ArticleGenerateOptions
     {
         $this->promotedWords = $promotedWords;
 
@@ -162,7 +165,7 @@ class ArticleGenerateOptions
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getImages(): array
     {
@@ -170,11 +173,11 @@ class ArticleGenerateOptions
     }
 
     /**
-     * @param array $images
+     * @param string[] $images
      *
      * @return ArticleGenerateOptions
      */
-    public function setImages(array $images): self
+    public function setImages(array $images): ArticleGenerateOptions
     {
         $this->images = $images;
 

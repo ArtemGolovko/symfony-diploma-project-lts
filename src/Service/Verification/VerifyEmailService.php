@@ -7,18 +7,31 @@ use App\Service\Mailer\Mailer;
 use App\Service\Verification\Exception\UserAlreadyVerifiedException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Security\Core\Security;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 
 class VerifyEmailService
 {
+    /**
+     * @var VerifyEmailHelperInterface
+     */
     private VerifyEmailHelperInterface $verifyEmailHelper;
 
+    /**
+     * @var Mailer
+     */
     private Mailer $mailer;
 
+    /**
+     * @var Security
+     */
     private Security $security;
 
+    /**
+     * @var EntityManagerInterface
+     */
     private EntityManagerInterface $entityManager;
 
     /**
@@ -43,6 +56,7 @@ class VerifyEmailService
      * @param User|null $user
      *
      * @return void
+     * @throws TransportExceptionInterface
      */
     public function requestVerification(?User $user = null): void
     {

@@ -27,6 +27,10 @@ class ProfileController extends AbstractController
 {
     /**
      * @Route("/dashboard", name="app_dashboard")
+     * @param SessionInterface    $session
+     * @param SubscriptionService $subscriptionService
+     *
+     * @return Response
      */
     public function dashboard(SessionInterface $session, SubscriptionService $subscriptionService): Response
     {
@@ -44,6 +48,7 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/dashboard/subscription", name="app_dashboard_subscription")
+     * @return Response
      */
     public function subscription(): Response
     {
@@ -52,9 +57,15 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/dashboard/order-subscription/{level}", name="app_dashboard_request_subscription")
+     * @param string                    $level
+     * @param Request                   $request
+     * @param CsrfTokenManagerInterface $manager
+     * @param SubscriptionService       $subscriptionService
+     *
+     * @return Response
      */
     public function requestSubscription(
-        $level,
+        string $level,
         Request $request,
         CsrfTokenManagerInterface $manager,
         SubscriptionService $subscriptionService
@@ -72,7 +83,8 @@ class ProfileController extends AbstractController
                 'success',
                 sprintf('Подписка %s оформлена, до %s', mb_convert_case($level, MB_CASE_TITLE), $date)
             );
-        } else {
+        }
+        else {
             $flashBug->add('error', 'Неверный csrf токен');
         }
 
@@ -81,6 +93,10 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/dashboard/verify-new-email", name="app_dashboard_verify_new_email")
+     * @param Request               $request
+     * @param VerifyNewEmailService $verifyNewEmail
+     *
+     * @return Response
      */
     public function verifyNewEmail(
         Request $request,
@@ -92,12 +108,15 @@ class ProfileController extends AbstractController
             $verifyNewEmail->verifyNewEmail($request);
         } catch (NewEmailAlreadyVerifiedException $exception) {
             $flashBag->add('error', 'Ви уже изминили почту');
+
             return $this->redirectToRoute('app_dashboard_profile');
         } catch (ExpiredSignatureException $exception) {
             $this->addFlash('error', 'Срок действия кода подверждения вичерпан.');
+
             return $this->redirectToRoute('app_dashboard_profile');
         } catch (VerifyEmailExceptionInterface $exception) {
             $flashBag->add('error', 'Не правильный код подтверждения');
+
             return $this->redirectToRoute('app_dashboard_profile');
         }
 
@@ -108,11 +127,16 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/dashboard/profile", name="app_dashboard_profile")
+     * @param Request                      $request
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param VerifyNewEmailService        $verifyNewEmail
+     *
+     * @return Response
      */
     public function profile(
-        Request                      $request,
+        Request $request,
         UserPasswordEncoderInterface $passwordEncoder,
-        VerifyNewEmailService        $verifyNewEmail
+        VerifyNewEmailService $verifyNewEmail
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -125,11 +149,13 @@ class ProfileController extends AbstractController
             $data = $form->getData();
             $flashBag = $request->getSession()->getFlashBag();
 
-            if ($data->name)
+            if ($data->name) {
                 $user->setName($data->name);
+            }
 
-            if ($data->plainPassword)
+            if ($data->plainPassword) {
                 $user->setPassword($passwordEncoder->encodePassword($user, $data->plainPassword));
+            }
 
             if ($data->email) {
                 $verifyNewEmail->requestVerification($data->email);
@@ -143,12 +169,13 @@ class ProfileController extends AbstractController
         }
 
         return $this->render('dashboard/profile/profile.html.twig', [
-            'form' => $form->createView()
+            'form' => $form->createView(),
         ]);
     }
 
     /**
      * @Route("/dashboard/modules", name="app_dashboard_modules")
+     * @retrun Response
      */
     public function modules(): Response
     {

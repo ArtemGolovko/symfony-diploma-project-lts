@@ -18,11 +18,13 @@ class Subscription
     /**
      * @ORM\Column(type="string", length=4)
      * @Assert\Choice(choices=Subscription::HIERARCHY)
+     * @var string
      */
     private string $level = self::HIERARCHY[0];
 
     /**
      * @ORM\Column(type="date_immutable", nullable=true)
+     * @var \DateTimeImmutable|null
      */
     private ?\DateTimeImmutable $expiresAt = null;
 

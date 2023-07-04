@@ -13,6 +13,12 @@ use Symfony\Component\Validator\Constraints\Length;
 
 class ProfileFormType extends AbstractType
 {
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array                $options
+     *
+     * @return void
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -22,17 +28,22 @@ class ProfileFormType extends AbstractType
                 'constraints' => [
                     new Length([
                         'min' => 6,
-                        'minMessage' => 'Пароль должен иметь длину хотя бы в шесть символов'
-                    ])
-                ]
+                        'minMessage' => 'Пароль должен иметь длину хотя бы в шесть символов',
+                    ]),
+                ],
             ])
         ;
     }
 
+    /**
+     * @param OptionsResolver $resolver
+     *
+     * @return void
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => ProfileFormModel::class
+            'data_class' => ProfileFormModel::class,
         ]);
     }
 }

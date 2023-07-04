@@ -8,8 +8,14 @@ use App\Service\Verification\VerifyEmailService;
 
 class RegistrationSuccessListener
 {
+    /**
+     * @var VerifyEmailService
+     */
     private VerifyEmailService $verifyEmail;
 
+    /**
+     * @var RedirectService
+     */
     private RedirectService $redirectService;
 
     /**

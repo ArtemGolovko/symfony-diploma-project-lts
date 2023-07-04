@@ -7,10 +7,10 @@ interface ThemeProviderInterface
     /**
      * @return Theme[]
      */
-    function getThemes(): array;
+    public function getThemes(): array;
 
     /**
      * @return string[]
      */
-    function getThemeName(): array;
+    public function getThemeName(): array;
 }

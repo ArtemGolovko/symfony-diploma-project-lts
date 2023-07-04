@@ -7,8 +7,14 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RegistrationSuccessEvent
 {
+    /**
+     * @var User
+     */
     private User $user;
 
+    /**
+     * @var Request
+     */
     private Request $request;
 
     /**

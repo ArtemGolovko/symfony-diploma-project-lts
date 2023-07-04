@@ -14,6 +14,7 @@ class FrontController extends AbstractController
 {
     /**
      * @Route("/", name="app_homepage")
+     * @return Response
      */
     public function homepage(): Response
     {
@@ -22,6 +23,7 @@ class FrontController extends AbstractController
 
     /**
      * @Route("/demo", name="app_demo")
+     * @return Response
      */
     public function demo(): Response
     {

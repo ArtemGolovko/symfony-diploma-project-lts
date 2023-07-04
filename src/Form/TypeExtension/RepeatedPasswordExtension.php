@@ -13,31 +13,42 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class RepeatedPasswordExtension extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array                $options
+     *
+     * @return void
+     */
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->addViewTransformer(new RepeatedPasswordTransformer())
             ->add('password', PasswordType::class, [
-                'constraints' => $options['constraints']
+                'constraints' => $options['constraints'],
             ])
             ->add('confirmPassword', PasswordType::class, [
                 'constraints' => [
-                    new ConfirmPassword()
-                ]
+                    new ConfirmPassword(),
+                ],
             ])
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    /**
+     * @param OptionsResolver $resolver
+     *
+     * @return void
+     */
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'constraints' => [
-                new NotBlank([ 'message' => 'Пароль не может быть пустым' ]),
+                new NotBlank(['message' => 'Пароль не может быть пустым']),
                 new Length([
                     'min' => 6,
-                    'minMessage' => 'Пароль должен иметь длину хотя бы в шесть символов'
-                ])
-            ]
+                    'minMessage' => 'Пароль должен иметь длину хотя бы в шесть символов',
+                ]),
+            ],
         ]);
     }
 }

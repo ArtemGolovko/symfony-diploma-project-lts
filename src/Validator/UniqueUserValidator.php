@@ -10,16 +10,32 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class UniqueUserValidator extends ConstraintValidator
 {
+    /**
+     * @var UserRepository
+     */
     private UserRepository $userRepository;
 
+    /**
+     * @var Security
+     */
     private Security $security;
 
+    /**
+     * @param UserRepository $userRepository
+     * @param Security       $security
+     */
     public function __construct(UserRepository $userRepository, Security $security)
     {
         $this->userRepository = $userRepository;
         $this->security = $security;
     }
 
+    /**
+     * @param string|null $value
+     * @param Constraint  $constraint
+     *
+     * @return void
+     */
     public function validate($value, Constraint $constraint): void
     {
         /* @var $constraint \App\Validator\UniqueUser */
