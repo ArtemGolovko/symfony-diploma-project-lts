@@ -7,7 +7,10 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
 use Symfony\Component\Security\Core\Security;
 
-class DoctrineModuleProvider implements ModuleProviderInterface
+/**
+ * User's module provider
+ */
+class UserModuleProvider implements ModuleProviderInterface
 {
     /**
      * @var Security

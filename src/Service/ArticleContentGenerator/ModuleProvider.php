@@ -10,17 +10,17 @@ class ModuleProvider implements ModuleProviderInterface
     private StaticModuleProvider $staticModuleProvider;
 
     /**
-     * @var DoctrineModuleProvider
+     * @var UserModuleProvider
      */
-    private DoctrineModuleProvider $doctrineModuleProvider;
+    private UserModuleProvider $doctrineModuleProvider;
 
     /**
      * @param StaticModuleProvider $staticModuleProvider
-     * @param DoctrineModuleProvider $doctrineModuleProvider
+     * @param UserModuleProvider   $doctrineModuleProvider
      */
     public function __construct(
         StaticModuleProvider $staticModuleProvider,
-        DoctrineModuleProvider $doctrineModuleProvider
+        UserModuleProvider $doctrineModuleProvider
     ) {
         $this->staticModuleProvider = $staticModuleProvider;
         $this->doctrineModuleProvider = $doctrineModuleProvider;
