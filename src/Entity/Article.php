@@ -3,12 +3,11 @@
 namespace App\Entity;
 
 use App\Entity\ValueObject\ArticleGenerateOptions;
-use App\Repository\ArticleRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ORM\Entity(repositoryClass=ArticleRepository::class)
+ * @ORM\Entity
  * @ORM\Table(name="articles")
  * @ORM\HasLifecycleCallbacks()
  */

@@ -2,29 +2,28 @@
 
 namespace App\Service\ArticleContentGenerator;
 
-use App\Repository\ModuleRepository;
+use App\Entity\Module;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectRepository;
 use Symfony\Component\Security\Core\Security;
 
 class DoctrineModuleProvider implements ModuleProviderInterface
 {
     /**
-     * @var ModuleRepository
-     */
-    private ModuleRepository $moduleRepository;
-
-    /**
      * @var Security
      */
     private Security $security;
 
+    private ObjectRepository $moduleRepository;
+
     /**
-     * @param ModuleRepository $moduleRepository
-     * @param Security         $security
+     * @param EntityManagerInterface $entityManager
+     * @param Security               $security
      */
-    public function __construct(ModuleRepository $moduleRepository, Security $security)
+    public function __construct(EntityManagerInterface $entityManager, Security $security)
     {
-        $this->moduleRepository = $moduleRepository;
         $this->security = $security;
+        $this->moduleRepository = $entityManager->getRepository(Module::class);
     }
 
     /**
