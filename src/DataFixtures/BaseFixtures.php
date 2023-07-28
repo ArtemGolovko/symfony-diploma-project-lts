@@ -9,19 +9,44 @@ use Faker\Generator;
 
 abstract class BaseFixtures extends Fixture
 {
+    /**
+     * @var Generator
+     */
     protected Generator $faker;
+
+    /**
+     * @var ObjectManager
+     */
     protected ObjectManager $manager;
 
+    /**
+     * @param ObjectManager $manager
+     *
+     * @return void
+     */
+    abstract protected function loadData(ObjectManager $manager): void;
+
+    /**
+     * @param ObjectManager $manager
+     *
+     * @return void
+     */
     public function load(ObjectManager $manager): void
     {
         $this->faker = Factory::create();
         $this->manager = $manager;
 
         $this->loadData($this->manager);
+
+        $manager->flush();
     }
 
-    abstract function loadData(ObjectManager $manager);
-
+    /**
+     * @param string   $className
+     * @param callable $factory
+     *
+     * @return object
+     */
     protected function create(string $className, callable $factory): object
     {
         $entity = new $className();
@@ -32,11 +57,44 @@ abstract class BaseFixtures extends Fixture
         return $entity;
     }
 
-    protected function createMany(string $className, int $quantity, callable $factory)
+    /**
+     * @param string   $className
+     * @param int      $quantity
+     * @param callable $factory
+     *
+     * @return void
+     */
+    protected function createMany(string $className, int $quantity, callable $factory): void
     {
         for ($i = 0; $i < $quantity; $i++) {
-            $this->create($className, $factory);
+            $entity = $this->create($className, $factory);
+
+            $this->addReference($className . '|' . $i, $entity);
         }
-        $this->manager->flush();
+    }
+
+    /**
+     * @param $className
+     *
+     * @return object
+     * @throws \Exception
+     */
+    protected function getRandomReference($className): object
+    {
+        if (!isset($this->referencesIndex[$className])) {
+            $this->referencesIndex[$className] = [];
+
+            foreach ($this->referenceRepository->getReferences() as $key => $reference) {
+                if (strpos($key, $className . '|') === 0) {
+                    $this->referencesIndex[$className][] = $key;
+                }
+            }
+        }
+
+        if (empty($this->referencesIndex[$className])) {
+            throw new \Exception('Не найдены ссылки на класс: ' . $className);
+        }
+
+        return $this->getReference($this->faker->randomElement($this->referencesIndex[$className]));
     }
 }

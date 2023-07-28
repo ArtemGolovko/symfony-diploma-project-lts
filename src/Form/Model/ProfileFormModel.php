@@ -11,9 +11,9 @@ class ProfileFormModel
     /**
      * @param User $user
      *
-     * @return static
+     * @return ProfileFormModel
      */
-    public static function fromUser(User $user): self
+    public static function fromUser(User $user): ProfileFormModel
     {
         $model = new self();
         $model->name = $user->getName();
@@ -23,13 +23,20 @@ class ProfileFormModel
         return $model;
     }
 
+    /**
+     * @var string|null
+     */
     public ?string $name;
 
     /**
      * @Assert\Email(message="Email должен иметь формат электронной почты")
      * @UniqueUser(message="Email уже используется", allowYourself=true)
+     * @var string|null
      */
     public ?string $email;
 
+    /**
+     * @var string|null
+     */
     public ?string $plainPassword;
 }

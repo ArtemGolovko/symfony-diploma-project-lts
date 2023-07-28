@@ -11,6 +11,12 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class ConfirmPasswordValidator extends ConstraintValidator
 {
+    /**
+     * @param            $value
+     * @param Constraint $constraint
+     *
+     * @return void
+     */
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof ConfirmPassword) {

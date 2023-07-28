@@ -4,8 +4,14 @@ namespace App\Service\Mailer;
 
 class Receiver implements ReceiverInterface
 {
+    /**
+     * @var string
+     */
     private string $name;
 
+    /**
+     * @var string
+     */
     private string $email;
 
     /**

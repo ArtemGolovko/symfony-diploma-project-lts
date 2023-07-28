@@ -14,6 +14,7 @@ class ArticleController extends AbstractController
 {
     /**
      * @Route("/dashboard/articles/create", name="app_dashboard_article_create")
+     * @return Response
      */
     public function create(): Response
     {
@@ -22,6 +23,7 @@ class ArticleController extends AbstractController
 
     /**
      * @Route("/dashboard/history", name="app_dashboard_history")
+     * @return Response
      */
     public function history(): Response
     {
@@ -30,6 +32,7 @@ class ArticleController extends AbstractController
 
     /**
      * @Route("/dashboard/articles/{id}", name="app_dashboard_article_show")
+     * @return Response
      */
     public function show(): Response
     {
