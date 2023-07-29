@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
@@ -132,6 +133,7 @@ class ProfileController extends AbstractController
      * @param VerifyNewEmailService        $verifyNewEmail
      *
      * @return Response
+     * @throws TransportExceptionInterface
      */
     public function profile(
         Request $request,
@@ -175,7 +177,7 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/dashboard/modules", name="app_dashboard_modules")
-     * @retrun Response
+     * @return Response
      */
     public function modules(): Response
     {

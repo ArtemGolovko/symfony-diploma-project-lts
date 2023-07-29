@@ -12,5 +12,5 @@ interface ThemeProviderInterface
     /**
      * @return string[]
      */
-    public function getThemeName(): array;
+    public function getThemeNames(): array;
 }
