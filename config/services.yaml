@@ -48,3 +48,6 @@ services:
             - '%article_content_generator.modules_dir%'
 
     App\Service\ArticleContentGenerator\ThemeChain: ~
+
+    App\Twig\ArticleGeneratorExtension:
+        tags: []

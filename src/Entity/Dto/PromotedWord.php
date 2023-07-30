@@ -2,7 +2,7 @@
 
 namespace App\Entity\Dto;
 
-class PromotedWord implements \Serializable
+class PromotedWord implements \Serializable, \Stringable
 {
     /**
      * @var string
@@ -80,5 +80,13 @@ class PromotedWord implements \Serializable
     public function unserialize($data): void
     {
         sscanf($data, "%d:%s", $this->repetitions, $this->word);
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->word;
     }
 }

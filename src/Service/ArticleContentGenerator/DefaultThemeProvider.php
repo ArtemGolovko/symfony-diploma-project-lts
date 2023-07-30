@@ -12,7 +12,7 @@ class DefaultThemeProvider implements ThemeProviderInterface
         $theme = new Theme();
 
         $theme->name = 'Default Theme';
-        $theme->paragraphs[] = 'Default paragraph about {{ word }}.';
+        $theme->paragraphs[] = 'Default paragraph about {{ keyword }}.';
         $theme->titles[] = 'Default title';
         $theme->images[] = 'https://placehold.co/600x400/EEE/31343C';
 
