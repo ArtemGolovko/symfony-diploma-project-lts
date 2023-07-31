@@ -6,14 +6,15 @@ use App\Entity\ValueObject\ArticleGenerateOptions;
 use App\Entity\ValueObject\Range;
 use App\Entity\ValueObject\Subscription;
 use App\Twig\ArticleGeneratorExtension;
+use App\Twig\Wrapper\ImagesWrapper;
 use App\Twig\Wrapper\KeywordWrapper;
+use App\Twig\Wrapper\ParagraphsWrapper;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 use Twig\Loader\ArrayLoader;
 use Twig\Source;
 use Twig\Token;
-use Twig\TokenStream;
 
 class ArticleContentGenerator
 {
@@ -53,13 +54,13 @@ class ArticleContentGenerator
      * @param ArticleGenerateOptions $options
      * @param Subscription           $subscription
      *
-     * @return string
+     * @return string[]
      *
      * @throws LoaderError
      * @throws SyntaxError
      * @throws \Exception
      */
-    public function generate(ArticleGenerateOptions $options, Subscription $subscription): string
+    public function generate(ArticleGenerateOptions $options, Subscription $subscription): array
     {
         $theme = $this->getTheme($options);
 
@@ -70,9 +71,29 @@ class ArticleContentGenerator
 
         $paragraphsDistribution = $this->getParagraphsDistribution($modules);
 
-        $paragraphs = $this->generateParagraphs($paragraphsDistribution, $theme, $options);
+        $paragraphs = new ParagraphsWrapper($this->generateParagraphs($paragraphsDistribution, $theme, $options));
+        $images = new ImagesWrapper($this->getImages($theme, $options->getImages()));
 
-        dd($title, $paragraphs);
+        $modulesContext = [
+            'title' => $title,
+            'paragraphs' => $paragraphs,
+            'paragraph' => $paragraphs,
+            'imageSrc' => $images,
+        ];
+
+        $article = implode(
+            '',
+            array_map(function (ModuleInterface $module) use ($modulesContext) {
+                $template = $this->twig->createTemplate($module->getTemplate());
+
+                return $template->render($modulesContext);
+            }, $modules)
+        );
+
+        return [
+            'title' => $title,
+            'content' => $article,
+        ];
     }
 
     /**
@@ -147,7 +168,7 @@ class ArticleContentGenerator
                 }
 
                 if ($token->test(Token::NAME_TYPE, 'paragraphs')) {
-                    $paragraphsDistribution[] = mt_rand(1, 3);
+                    $paragraphsDistribution[] = random_int(1, 3);
                 }
             }
         }
@@ -203,7 +224,7 @@ class ArticleContentGenerator
      * @param string $paragraph
      * @param string $promotedWord
      *
-     * @return TokenStream
+     * @return string
      */
     private function injectPromotedWord(string $paragraph, string $promotedWord): string
     {
@@ -241,5 +262,33 @@ class ArticleContentGenerator
         return $template->render([
             'keyword' => $keyword,
         ]);
+    }
+
+    /**
+     * @param Theme $theme
+     * @param array $images
+     *
+     * @return array
+     */
+    private function getImages(Theme $theme, array $images): array
+    {
+        if (count($images) > 0) {
+            return $images;
+        }
+
+        $imagesAmount = random_int(1, 5);
+
+        if (count($theme->images) <= $imagesAmount) {
+            return $theme->images;
+        }
+
+        $indexes = array_rand($images, $imagesAmount);
+        $selectedImages = [];
+
+        foreach ($indexes as $index) {
+            $selectedImages[] = $theme->images[$index];
+        }
+
+        return $selectedImages;
     }
 }
