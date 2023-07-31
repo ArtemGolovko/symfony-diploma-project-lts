@@ -167,47 +167,32 @@ class ArticleContentGenerator
     private function generateParagraphs(array $distribution, Theme $theme, ArticleGenerateOptions $options): array
     {
         $paragraphsAmount = array_sum($distribution);
-        /** @var TokenStream[] $paragraphs */
         $paragraphs = [];
+        $keyword = new KeywordWrapper($options->getKeywords());
 
         for ($i = 0; $i < $paragraphsAmount; $i++) {
             $index = array_rand($theme->paragraphs);
-            $paragraph = $theme->paragraphs[$index];
-            $paragraphs[] = $this->twig->tokenize(new Source($paragraph, 'paragraph'));
+            $template = $this->twig->createTemplate($theme->paragraphs[$index]);
+            $paragraphs[] = $template->render(['keyword' => $keyword]);
         }
 
         $promotedWords = $options->getPromotedWords();
-        $paragraphContext = [];
 
-        foreach ($promotedWords as $key => $promotedWord) {
-            $paragraphContext['promoted_word_' . $key] = $promotedWord->getWord();
-
+        foreach ($promotedWords as $promotedWord) {
             for ($i = 0; $i < $promotedWord->getRepetitions(); $i++) {
                 $index = array_rand($paragraphs);
 
-                $paragraphs[$index] = $this->injectPromotedWord(
-                    $paragraphs[$index],
-                    'promoted_word_' . $key
-                );
+                $paragraphs[$index] = $this->injectPromotedWord($paragraphs[$index], $promotedWord);
             }
         }
-        $renderedParagraphs = [];
-        $paragraphContext['keyword'] = new KeywordWrapper($options->getKeywords());
 
-        foreach ($paragraphs as $paragraph) {
-            $paragraphTemplate = $this->recompileTokens($paragraph);
-            $template = $this->twig->createTemplate($paragraphTemplate);
-
-            $renderedParagraphs[] = $template->render($paragraphContext);
-        }
-
-        $renderedParagraphs = array_reverse($renderedParagraphs);
+        $paragraphs = array_reverse($paragraphs);
         $shapedParagraphs = [];
 
         foreach ($distribution as $key => $amount) {
             $shapedParagraphs[] = [];
             for ($i = 0; $i < $amount; $i++) {
-                $shapedParagraphs[$key][] = array_pop($renderedParagraphs);
+                $shapedParagraphs[$key][] = array_pop($paragraphs);
             }
         }
 
@@ -215,125 +200,23 @@ class ArticleContentGenerator
     }
 
     /**
-     * @param TokenStream $paragraph
-     * @param string      $wordPlaceholder
+     * @param string $paragraph
+     * @param string $promotedWord
      *
      * @return TokenStream
-     * @throws SyntaxError
      */
-    private function injectPromotedWord(TokenStream $paragraph, string $wordPlaceholder): TokenStream
+    private function injectPromotedWord(string $paragraph, string $promotedWord): string
     {
-        /** @var Token[] $tokens */
-        $tokens = [];
-        $textTokenIndexes = [];
+        $words = explode(' ', $paragraph);
 
-        for (; !$paragraph->isEOF(); $paragraph->next()) {
-            $tokens[] = $paragraph->getCurrent();
+        if (count($words) === 1) {
+            return $promotedWord . ' ' . $paragraph;
         }
 
-        $tokens[] = $paragraph->getCurrent();
+        $insetIndex = random_int(1, count($words) - 1);
+        array_splice($words, $insetIndex, 0, $promotedWord);
 
-        foreach ($tokens as $index => $token) {
-            if ($token->test(Token::TEXT_TYPE)) {
-                $textTokenIndexes[] = $index;
-            }
-        }
-
-        $index = array_rand($textTokenIndexes);
-        $textTokenIndex = $textTokenIndexes[$index];
-
-        $textToken = $tokens[$textTokenIndex];
-
-        $words = explode(' ', $textToken->getValue());
-
-        $wordIndex = array_rand($words);
-        $wordsBefore = [];
-        $wordsAfter = [];
-
-        foreach ($words as $index => $word) {
-            if ($index <= $wordIndex) {
-                $wordsBefore[] = $word;
-                continue;
-            }
-
-            $wordsAfter[] = $word;
-        }
-
-        $textBefore = implode(' ', $wordsBefore) . ' ';
-
-        $textAfter = ' ' . implode(' ', $wordsAfter);
-
-        $tokensBefore = array_slice($tokens, 0, $textTokenIndex);
-        $tokensAfter = array_slice($tokens, $textTokenIndex + 1);
-
-        $lineno = $textToken->getLine();
-
-        $insertTokens = [
-            new Token(Token::TEXT_TYPE, $textBefore, $lineno),
-            new Token(Token::VAR_START_TYPE, '', $lineno),
-            new Token(Token::NAME_TYPE, $wordPlaceholder, $lineno),
-            new Token(Token::VAR_END_TYPE, '', $lineno),
-            new Token(Token::TEXT_TYPE, $textAfter, $lineno),
-        ];
-
-        $insertTokens = array_filter($insertTokens, function (Token $token) {
-            return !$token->test(Token::TEXT_TYPE, '');
-        });
-
-        $newTokens = array_merge($tokensBefore, $insertTokens, $tokensAfter);
-
-        return new TokenStream($newTokens);
-    }
-
-    /**
-     * @param TokenStream $tokens
-     *
-     * @return string
-     * @throws SyntaxError
-     */
-    private function recompileTokens(TokenStream $tokens): string
-    {
-        $token_array = [];
-
-        for (; !$tokens->isEOF(); $tokens->next()) {
-            $token_array[] = $tokens->getCurrent();
-        }
-
-        return implode(
-            '',
-            array_map(function (Token $token) {
-                switch ($token->getType()) {
-                    case Token::TEXT_TYPE:
-                    case Token::NAME_TYPE:
-                    case Token::NUMBER_TYPE:
-                        return $token->getValue();
-                    case Token::BLOCK_START_TYPE:
-                        return '{% ';
-                    case Token::VAR_START_TYPE:
-                        return '{{ ';
-                    case Token::BLOCK_END_TYPE:
-                        return ' %}';
-                    case Token::VAR_END_TYPE:
-                        return ' }}';
-                    case Token::STRING_TYPE:
-                        return "'" . $token->getValue() . "'";
-                    case Token::OPERATOR_TYPE:
-                        return ' ' . $token->getValue() . ' ';
-                    case Token::PUNCTUATION_TYPE:
-                        return $token->getValue() . ' ';
-                    case Token::INTERPOLATION_START_TYPE:
-                        return '#{';
-                    case Token::INTERPOLATION_END_TYPE:
-                        return '}';
-                    case Token::ARROW_TYPE:
-                        return ' => ';
-                    case Token::EOF_TYPE:
-                        return '';
-                }
-
-                return '';
-            }, $token_array)
-        );
+        return implode(' ', $words);
     }
 
     /**
