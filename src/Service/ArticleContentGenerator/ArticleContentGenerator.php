@@ -74,6 +74,11 @@ class ArticleContentGenerator
         $paragraphs = new ParagraphsWrapper($this->generateParagraphs($paragraphsDistribution, $theme, $options));
         $images = new ImagesWrapper($this->getImages($theme, $options->getImages()));
 
+        $loader = new ArrayLoader([]);
+
+        $twig = new Environment($loader, ['autoescape' => false]);
+        $twig->addExtension(new ArticleGeneratorExtension());
+
         $modulesContext = [
             'title' => $title,
             'paragraphs' => $paragraphs,
@@ -83,8 +88,8 @@ class ArticleContentGenerator
 
         $article = implode(
             '',
-            array_map(function (ModuleInterface $module) use ($modulesContext) {
-                $template = $this->twig->createTemplate($module->getTemplate());
+            array_map(function (ModuleInterface $module) use ($modulesContext, $twig) {
+                $template = $twig->createTemplate($module->getTemplate());
 
                 return $template->render($modulesContext);
             }, $modules)
@@ -136,11 +141,12 @@ class ArticleContentGenerator
     private function getModules(Range $range): array
     {
         $modules = $this->moduleProvider->getModules();
-        $indexes = array_rand($modules, $range->generate());
+        $modulesAmount = $range->generate();
 
         $selectedModules = [];
 
-        foreach ($indexes as $index) {
+        for ($i = 0; $i < $modulesAmount; $i++) {
+            $index = array_rand($modules);
             $selectedModules[] = $modules[$index];
         }
 
