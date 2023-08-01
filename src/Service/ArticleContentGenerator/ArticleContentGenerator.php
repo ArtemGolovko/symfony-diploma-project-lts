@@ -5,6 +5,10 @@ namespace App\Service\ArticleContentGenerator;
 use App\Entity\ValueObject\ArticleGenerateOptions;
 use App\Entity\ValueObject\Range;
 use App\Entity\ValueObject\Subscription;
+use App\Service\ArticleContentGenerator\Module\ModuleInterface;
+use App\Service\ArticleContentGenerator\Module\ModuleProviderInterface;
+use App\Service\ArticleContentGenerator\Theme\Theme;
+use App\Service\ArticleContentGenerator\Theme\ThemeChain;
 use App\Twig\ArticleGeneratorExtension;
 use App\Twig\Wrapper\ImagesWrapper;
 use App\Twig\Wrapper\KeywordWrapper;
@@ -86,7 +90,7 @@ class ArticleContentGenerator
             'imageSrc' => $images,
         ];
 
-        $article = implode(
+        $content = implode(
             '',
             array_map(function (ModuleInterface $module) use ($modulesContext, $twig) {
                 $template = $twig->createTemplate($module->getTemplate());
@@ -97,7 +101,7 @@ class ArticleContentGenerator
 
         return [
             'title' => $title,
-            'content' => $article,
+            'content' => $content,
         ];
     }
 

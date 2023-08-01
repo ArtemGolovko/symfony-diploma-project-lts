@@ -12,10 +12,10 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
-            App\Service\ArticleContentGenerator\ModuleProviderInterface: '@App\Service\ArticleContentGenerator\ModuleProvider'
+            App\Service\ArticleContentGenerator\Module\ModuleProviderInterface: '@App\Service\ArticleContentGenerator\Module\ModuleProvider'
 
     _instanceof:
-        App\Service\ArticleContentGenerator\ThemeProviderInterface:
+        App\Service\ArticleContentGenerator\Theme\ThemeProviderInterface:
             tags: ['article_content_generator.theme_provider']
 
     # makes classes in src/ available to be used as services
@@ -42,12 +42,12 @@ services:
               event: app.registration_success
               method: onRegistrationSuccess
 
-    App\Service\ArticleContentGenerator\StaticModuleProvider:
+    App\Service\ArticleContentGenerator\Module\StaticModuleProvider:
         arguments:
             - '%app.resources_dir%'
             - '%article_content_generator.modules_dir%'
 
-    App\Service\ArticleContentGenerator\ThemeChain: ~
+    App\Service\ArticleContentGenerator\Theme\ThemeChain: ~
 
     App\Twig\ArticleGeneratorExtension:
         tags: []

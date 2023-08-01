@@ -2,7 +2,7 @@
 
 namespace App\DependancyInjection\Compiler;
 
-use App\Service\ArticleContentGenerator\ThemeChain;
+use App\Service\ArticleContentGenerator\Theme\ThemeChain;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;

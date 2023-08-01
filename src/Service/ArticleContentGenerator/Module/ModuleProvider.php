@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\ArticleContentGenerator;
+namespace App\Service\ArticleContentGenerator\Module;
 
 class ModuleProvider implements ModuleProviderInterface
 {

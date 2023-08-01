@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\ArticleContentGenerator;
+namespace App\Service\ArticleContentGenerator\Theme;
 
 class DefaultThemeProvider implements ThemeProviderInterface
 {

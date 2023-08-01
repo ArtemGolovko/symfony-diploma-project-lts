@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\ArticleContentGenerator;
+namespace App\Service\ArticleContentGenerator\Module;
 
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\KernelInterface;
