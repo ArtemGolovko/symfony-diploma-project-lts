@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\ArticleContentGenerator;
+namespace App\Service\ArticleContentGenerator\Theme;
 
 interface ThemeProviderInterface
 {
@@ -12,5 +12,5 @@ interface ThemeProviderInterface
     /**
      * @return string[]
      */
-    public function getThemeName(): array;
+    public function getThemeNames(): array;
 }

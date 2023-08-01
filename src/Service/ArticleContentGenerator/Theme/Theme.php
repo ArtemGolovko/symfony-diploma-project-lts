@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\ArticleContentGenerator;
+namespace App\Service\ArticleContentGenerator\Theme;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -21,7 +21,7 @@ class Theme
     public array $titles;
 
     /**
-     * @var array[]
+     * @var string[]
      */
     public array $paragraphs;
 
