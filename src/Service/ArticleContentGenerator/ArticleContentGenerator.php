@@ -4,7 +4,6 @@ namespace App\Service\ArticleContentGenerator;
 
 use App\Entity\ValueObject\ArticleGenerateOptions;
 use App\Entity\ValueObject\Range;
-use App\Entity\ValueObject\Subscription;
 use App\Service\ArticleContentGenerator\Module\ModuleInterface;
 use App\Service\ArticleContentGenerator\Module\ModuleProviderInterface;
 use App\Service\ArticleContentGenerator\Theme\Theme;
@@ -56,27 +55,28 @@ class ArticleContentGenerator
 
     /**
      * @param ArticleGenerateOptions $options
-     * @param Subscription           $subscription
+     * @param bool                   $advancedFeatures
      *
      * @return string[]
      *
      * @throws LoaderError
      * @throws SyntaxError
-     * @throws \Exception
      */
-    public function generate(ArticleGenerateOptions $options, Subscription $subscription): array
+    public function generate(ArticleGenerateOptions $options, bool $advancedFeatures): array
     {
         $theme = $this->getTheme($options);
 
-        $keyword = new KeywordWrapper($options->getKeywords());
+        $keyword = new KeywordWrapper($options->getKeywords(), $advancedFeatures);
 
         $modules = $this->getModules($options->getSize());
         $title = $this->generateTitle($theme, $options->getTitle(), $keyword);
 
         $paragraphsDistribution = $this->getParagraphsDistribution($modules);
 
-        $paragraphs = new ParagraphsWrapper($this->generateParagraphs($paragraphsDistribution, $theme, $options));
-        $images = new ImagesWrapper($this->getImages($theme, $options->getImages()));
+        $paragraphs = new ParagraphsWrapper(
+            $this->generateParagraphs($paragraphsDistribution, $theme, $options, $advancedFeatures)
+        );
+        $images = new ImagesWrapper($this->getImages($theme, $advancedFeatures ? $options->getImages() : []));
 
         $loader = new ArrayLoader([]);
 
@@ -195,11 +195,15 @@ class ArticleContentGenerator
      * @throws SyntaxError
      * @throws LoaderError
      */
-    private function generateParagraphs(array $distribution, Theme $theme, ArticleGenerateOptions $options): array
-    {
+    private function generateParagraphs(
+        array $distribution,
+        Theme $theme,
+        ArticleGenerateOptions $options,
+        bool $advancedFeatures
+    ): array {
         $paragraphsAmount = array_sum($distribution);
         $paragraphs = [];
-        $keyword = new KeywordWrapper($options->getKeywords());
+        $keyword = new KeywordWrapper($options->getKeywords(), $advancedFeatures);
 
         for ($i = 0; $i < $paragraphsAmount; $i++) {
             $index = array_rand($theme->paragraphs);
@@ -208,6 +212,10 @@ class ArticleContentGenerator
         }
 
         $promotedWords = $options->getPromotedWords();
+
+        if (!$advancedFeatures) {
+            array_splice($promotedWords, 1);
+        }
 
         foreach ($promotedWords as $promotedWord) {
             for ($i = 0; $i < $promotedWord->getRepetitions(); $i++) {
