@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Dto\PromotedWord;
 use App\Entity\ValueObject\ArticleGenerateOptions;
 use App\Entity\ValueObject\Range;
+use App\Form\TypeExtension\PromotedWordExtension;
 use App\Service\ArticleContentGenerator\Theme\ThemeChain;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\DataMapperInterface;
@@ -62,14 +63,13 @@ class CreateArticleFormType extends AbstractType implements DataMapperInterface
                 'empty_data' => null,
             ])
             ->add('promoted_words', CollectionType::class, [
-                'entry_type' => TextType::class,
+                'entry_type' => PromotedWordExtension::class,
                 'allow_add' => true,
                 'allow_delete' => true,
-                'data' => ['', '', ''],
-                'empty_data' => '',
-                'delete_empty' => function (?string $promotedWord) {
-                    return empty($promotedWord);
+                'delete_empty' => function (PromotedWord $promotedWord): bool {
+                    return $promotedWord->isEmpty();
                 },
+                'data' => [PromotedWord::empty()],
             ])
             ->add('images', FileType::class, [
                 'multiple' => true,
@@ -106,11 +106,7 @@ class CreateArticleFormType extends AbstractType implements DataMapperInterface
         $forms['title']->setData($viewData->getTitle());
         $forms['size_begin']->setData($sizeBegin);
         $forms['size_end']->setData($sizeEnd === $sizeBegin ? null : $sizeEnd);
-        $forms['promoted_words']->setData(
-            array_map(function (PromotedWord $promotedWord) {
-                return $promotedWord->getWord();
-            }, $viewData->getPromotedWords())
-        );
+        $forms['promoted_words']->setData($viewData->getPromotedWords());
     }
 
     /**
@@ -132,9 +128,7 @@ class CreateArticleFormType extends AbstractType implements DataMapperInterface
                 return !empty($keyword);
             }),
             new Range($forms['size_begin']->getData(), $forms['size_end']->getData()),
-            array_map(function (string $word) {
-                return new PromotedWord($word, 2);
-            }, $forms['promoted_words']->getData()),
+            $forms['promoted_words']->getData(),
             $title === '' ? null : $title
         );
     }

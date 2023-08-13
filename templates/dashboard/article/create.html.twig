@@ -60,11 +60,23 @@
                         <p class="card-title">Продвигаемые слова</p>
                         {%  for promoted_word in form.promoted_words %}
                             <div class="row">
-                                {{ form_row(promoted_word, {
-                                    label: 'Продвигаемое слово',
-                                    attr: { placeholder: 'Продвигаемое слово' },
-                                    required: false
-                                }) }}
+                                <div class="col">
+                                    {{ form_row(promoted_word.word, {
+                                        label: 'Продвигаемое слово',
+                                        attr: { placeholder: 'Продвигаемое слово' },
+                                        required: false
+                                    }) }}
+                                </div>
+                                <div class="col">
+                                    {{ form_row(promoted_word.repetitions, {
+                                        label: 'кол-во',
+                                        attr: {
+                                            placeholder: 'кол-во',
+                                            value: (promoted_word.repetitions.vars.value == 0) ? null : promoted_word.repetitions.vars.value
+                                        },
+                                        required: true,
+                                    }) }}
+                                </div>
                             </div>
                         {% endfor %}
                     </div>
