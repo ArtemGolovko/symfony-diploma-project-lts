@@ -2,8 +2,11 @@
 
 namespace App\Controller\Dashboard;
 
+use App\Entity\ValueObject\ArticleGenerateOptions;
+use App\Form\CreateArticleFormType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -14,11 +17,25 @@ class ArticleController extends AbstractController
 {
     /**
      * @Route("/dashboard/articles/create", name="app_dashboard_article_create")
+     * @param Request $request
+     *
      * @return Response
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
-        return $this->render('dashboard/article/create.html.twig');
+        $form = $this->createForm(CreateArticleFormType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var ArticleGenerateOptions $data */
+            $data = $form->getData();
+
+            dd($data);
+        }
+
+        return $this->render('dashboard/article/create.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 
     /**

@@ -30,16 +30,8 @@ class KeywordWrapper implements \Stringable
      */
     public function getForm(int $form): string
     {
-        if (!$this->forms) {
-            if (1 > count($this->keywords)) {
-                throw new \OutOfBoundsException();
-            }
-
+        if (!$this->forms || $form >= count($this->keywords)) {
             return $this->keywords[0];
-        }
-
-        if ($form >= count($this->keywords)) {
-            throw new \OutOfBoundsException();
         }
 
         return $this->keywords[$form];

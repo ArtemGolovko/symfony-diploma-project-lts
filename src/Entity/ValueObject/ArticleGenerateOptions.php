@@ -20,7 +20,7 @@ class ArticleGenerateOptions
 
     /**
      * @ORM\Column(type="simple_array")
-     * @Assert\Count(min=1, max=6)
+     * @Assert\Count(min=1, max=7)
      * @var string[]
      */
     private array $keywords;
