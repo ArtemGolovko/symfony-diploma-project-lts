@@ -69,7 +69,6 @@ class CreateArticleFormType extends AbstractType implements DataMapperInterface
                 'delete_empty' => function (PromotedWord $promotedWord): bool {
                     return $promotedWord->isEmpty();
                 },
-                'data' => [PromotedWord::empty()],
             ])
             ->add('images', FileType::class, [
                 'multiple' => true,

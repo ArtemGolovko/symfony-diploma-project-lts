@@ -20,8 +20,12 @@ class PromotedWordExtension extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('word', TextType::class)
-            ->add('repetitions', NumberType::class)
+            ->add('word', TextType::class, [
+                'empty_data' => '',
+            ])
+            ->add('repetitions', NumberType::class, [
+                'empty_data' => '0',
+            ])
         ;
     }
 

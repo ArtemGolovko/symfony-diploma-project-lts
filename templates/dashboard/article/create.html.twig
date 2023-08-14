@@ -74,8 +74,33 @@
                                             placeholder: 'кол-во',
                                             value: (promoted_word.repetitions.vars.value == 0) ? null : promoted_word.repetitions.vars.value
                                         },
-                                        required: true,
+                                        required: false,
                                     }) }}
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-label-group">
+                                        <input  type="text"
+                                                id="create_article_form_promoted_words_0_word"
+                                                name="create_article_form[promoted_words][0][word]"
+                                                placeholder="Продвигаемое слово"
+                                                class="form-control"
+                                        >
+                                        <label for="create_article_form_promoted_words_0_word">Продвигаемое слово</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-label-group">
+                                        <input  type="text"
+                                                id="create_article_form_promoted_words_0_repetitions"
+                                                name="create_article_form[promoted_words][0][repetitions]"
+                                                placeholder="кол-во"
+                                                class="form-control"
+                                        >
+                                        <label for="create_article_form_promoted_words_0_repetitions">кол-во</label>
+                                    </div>
                                 </div>
                             </div>
                         {% endfor %}
@@ -84,8 +109,9 @@
                 {{ form_row(form.images, {
                     required: false
                 }) }}
+                {{ form_row(form._token) }}
                 <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Создать</button>
-            {{ form_end(form) }}
+            {{ form_end(form, { render_rest: false }) }}
         </div>
     </div>
 
@@ -110,17 +136,6 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script>
-        /** @type {HTMLInputElement} */
-        var imageInput = document.querySelector('input.custom-file-input');
-        var imageLabel = document.querySelector('label.custom-file-label');
-        imageInput.addEventListener('change', onchange);
-
-        function onchange(event) {
-            imageLabel.innerText  = Array.from(event.target.files).map(function (file) {
-                return file.name;
-            }).join(', ');
-        }
-    </script>
+    <script src="{{ asset('js/dashboard_create_article.js') }}"></script>
 {% endblock %}
 
