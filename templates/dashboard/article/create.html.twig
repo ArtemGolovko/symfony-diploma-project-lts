@@ -1,12 +1,12 @@
 {% extends 'base_dashboard.html.twig' %}
 
-{# form_theme form.images with ['form_div_layout.html.twig'] only #}
 {% form_theme form.keywords 'form/register_layout.html.twig' %}
 {% form_theme form.title 'form/register_layout.html.twig' %}
 {% form_theme form.size_begin 'form/register_layout.html.twig' %}
 {% form_theme form.size_end 'form/register_layout.html.twig' %}
 {% form_theme form.promoted_words 'form/register_layout.html.twig' %}
 
+{% set FREE = constant('App\\Entity\\ValueObject\\Subscription::FREE') %}
 
 {% block content %}
     <h1 class="mt-4">Создание статьи</h1>
@@ -34,7 +34,8 @@
                             {{ form_row(keyword[0], {
                                 label: keyword[1],
                                 attr: { placeholder: keyword[1] },
-                                required: index == 0
+                                required: index == 0,
+                                disabled: index != 0 and app.user.subscription.level == FREE
                             }) }}
                         {% endfor %}
                     </div>
@@ -58,13 +59,14 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <p class="card-title">Продвигаемые слова</p>
-                        {%  for promoted_word in form.promoted_words %}
+                        {%  for index, promoted_word in form.promoted_words %}
                             <div class="row">
                                 <div class="col">
                                     {{ form_row(promoted_word.word, {
                                         label: 'Продвигаемое слово',
                                         attr: { placeholder: 'Продвигаемое слово' },
-                                        required: false
+                                        required: false,
+                                        disabled: index != 0 and app.user.subscription.level == FREE
                                     }) }}
                                 </div>
                                 <div class="col">
@@ -75,6 +77,7 @@
                                             value: (promoted_word.repetitions.vars.value == 0) ? null : promoted_word.repetitions.vars.value
                                         },
                                         required: false,
+                                        disabled: index != 0 and app.user.subscription.level == FREE
                                     }) }}
                                 </div>
                             </div>
@@ -107,7 +110,8 @@
                     </div>
                 </div>
                 {{ form_row(form.images, {
-                    required: false
+                    required: false,
+                    disabled: app.user.subscription.level == FREE
                 }) }}
                 {{ form_row(form._token) }}
                 <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Создать</button>
@@ -136,6 +140,8 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('js/dashboard_create_article.js') }}"></script>
+    {% if app.user.subscription.level != FREE  %}
+        <script src="{{ asset('js/dashboard_create_article.js') }}"></script>
+    {% endif %}
 {% endblock %}
 
