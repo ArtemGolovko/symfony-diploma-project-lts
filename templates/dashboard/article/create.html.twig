@@ -1,5 +1,13 @@
 {% extends 'base_dashboard.html.twig' %}
 
+{% form_theme form.keywords 'form/register_layout.html.twig' %}
+{% form_theme form.title 'form/register_layout.html.twig' %}
+{% form_theme form.size_begin 'form/register_layout.html.twig' %}
+{% form_theme form.size_end 'form/register_layout.html.twig' %}
+{% form_theme form.promoted_words 'form/register_layout.html.twig' %}
+
+{% set FREE = constant('App\\Entity\\ValueObject\\Subscription::FREE') %}
+
 {% block content %}
     <h1 class="mt-4">Создание статьи</h1>
     <div class="row">
@@ -8,116 +16,111 @@
             <div class="alert alert-danger" role="alert">
                 Превышен лимит создания статей, чтобы снять лимит <a href="{{ path('app_dashboard_subscription') }}">Улучшите подписку</a>
             </div>
-            <form>
-                <div class="form-group">
-                    <label for="fieldTheme">Тематика</label>
-                    <select class="form-control" id="fieldTheme">
-                        <option>-</option>
-                        <option>Про еду</option>
-                        <option>Про PHP</option>
-                    </select>
-                </div>
-                <div class="form-label-group">
-                    <input type="text" id="articleTitle" class="form-control" placeholder="Заголовок статьи" required autofocus value="Тестовая статья" disabled>
-                    <label for="articleTitle">Заголовок статьи</label>
-                </div>
+            {{ form_start(form) }}
+                {{ form_row(form.theme, {
+                    label: 'Тематика',
+                    placeholder: '-',
+                    required: true
+                }) }}
+                {{ form_row(form.title, {
+                    label: 'Заголовок статьи',
+                    attr: { placeholder: 'Заголовок статьи' },
+                    required: false
+                }) }}
                 <div class="card mb-4">
                     <div class="card-body">
                         <p class="card-title">Ключевое слово</p>
-                        <div class="form-label-group">
-                            <input type="text" id="article0Word" class="form-control" placeholder="Ключевое слово" required disabled value="EXAMPLE">
-                            <label for="article0Word">Ключевое слово</label>
-                        </div>
-                        <div class="form-label-group">
-                            <input type="text" id="article1Word" class="form-control" placeholder="Родительный падеж" required disabled value="EXAMPLE">
-                            <label for="article1Word">Родительный падеж</label>
-                        </div>
-                        <div class="form-label-group">
-                            <input type="text" id="article2Word" class="form-control" placeholder="Дательный падеж" required disabled value="EXAMPLE">
-                            <label for="article2Word">Дательный падеж</label>
-                        </div>
-                        <div class="form-label-group">
-                            <input type="text" id="article3Word" class="form-control" placeholder="Винительный падеж" required disabled value="EXAMPLE">
-                            <label for="article3Word">Винительный падеж</label>
-                        </div>
-                        <div class="form-label-group">
-                            <input type="text" id="article4Word" class="form-control" placeholder="Творительный падеж" required disabled value="EXAMPLE">
-                            <label for="article4Word">Творительный падеж</label>
-                        </div>
-                        <div class="form-label-group">
-                            <input type="text" id="article5Word" class="form-control" placeholder="Предложный падеж" required disabled value="EXAMPLE">
-                            <label for="article5Word">Предложный падеж</label>
-                        </div>
-                        <div class="form-label-group">
-                            <input type="text" id="article2Word" class="form-control" placeholder="Множественное число" required disabled value="EXAMPLES">
-                            <label for="article2Word">Множественное число</label>
-                        </div>
+                        {% for index, keyword in zip(form.keywords, ['Ключевое слово', 'Родительный падеж', 'Дательный падеж', 'Винительный падеж', 'Творительный падеж', 'Предложный падеж', 'Множественное число']) %}
+                            {{ form_row(keyword[0], {
+                                label: keyword[1],
+                                attr: { placeholder: keyword[1] },
+                                required: index == 0,
+                                disabled: index != 0 and app.user.subscription.level == FREE
+                            }) }}
+                        {% endfor %}
                     </div>
                 </div>
-
                 <div class="row">
                     <div class="col">
-                        <div class="form-label-group">
-                            <input type="text" id="sizeFromField" class="form-control" placeholder="Размер статьи">
-                            <label for="sizeFromField">Размер статьи от</label>
-                        </div>
+                        {{ form_row(form.size_begin, {
+                            label: 'Размер статьи от',
+                            attr: { placeholder: 'Размер статьи' },
+                            required: true
+                        }) }}
                     </div>
                     <div class="col">
-                        <div class="form-label-group">
-                            <input type="text" id="sizeToField" class="form-control" placeholder="До">
-                            <label for="sizeToField">До</label>
-                        </div>
+                        {{ form_row(form.size_end, {
+                            label: 'До',
+                            attr: { placeholder: 'До' },
+                            required: false
+                        }) }}
                     </div>
                 </div>
-
-
                 <div class="card mb-4">
                     <div class="card-body">
                         <p class="card-title">Продвигаемые слова</p>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-label-group">
-                                    <input type="text" id="word1Field" class="form-control" placeholder="Продвигаемое слово">
-                                    <label for="word1Field">Продвигаемое слово</label>
+                        {%  for index, promoted_word in form.promoted_words %}
+                            <div class="row">
+                                <div class="col">
+                                    {{ form_row(promoted_word.word, {
+                                        label: 'Продвигаемое слово',
+                                        attr: { placeholder: 'Продвигаемое слово' },
+                                        required: false,
+                                        disabled: index != 0 and app.user.subscription.level == FREE
+                                    }) }}
+                                </div>
+                                <div class="col">
+                                    {{ form_row(promoted_word.repetitions, {
+                                        label: 'кол-во',
+                                        attr: {
+                                            placeholder: 'кол-во',
+                                            value: (promoted_word.repetitions.vars.value == 0) ? null : promoted_word.repetitions.vars.value
+                                        },
+                                        required: false,
+                                        disabled: index != 0 and app.user.subscription.level == FREE
+                                    }) }}
                                 </div>
                             </div>
-                            <div class="col">
-                                <div class="form-label-group">
-                                    <input type="text" id="word1CountField" class="form-control" placeholder="кол-во">
-                                    <label for="word1CountField">кол-во</label>
+                        {% else %}
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-label-group">
+                                        <input  type="text"
+                                                id="create_article_form_promoted_words_0_word"
+                                                name="create_article_form[promoted_words][0][word]"
+                                                placeholder="Продвигаемое слово"
+                                                class="form-control"
+                                        >
+                                        <label for="create_article_form_promoted_words_0_word">Продвигаемое слово</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-label-group">
+                                        <input  type="text"
+                                                id="create_article_form_promoted_words_0_repetitions"
+                                                name="create_article_form[promoted_words][0][repetitions]"
+                                                placeholder="кол-во"
+                                                class="form-control"
+                                        >
+                                        <label for="create_article_form_promoted_words_0_repetitions">кол-во</label>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-label-group">
-                                    <input type="text" id="word2Field" class="form-control" placeholder="Продвигаемое слово">
-                                    <label for="word2Field">Продвигаемое слово</label>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-label-group">
-                                    <input type="text" id="word2CountField" class="form-control" placeholder="кол-во">
-                                    <label for="word2CountField">кол-во</label>
-                                </div>
-                            </div>
-                        </div>
-                        ...
+                        {% endfor %}
                     </div>
                 </div>
-
-
-                <div class="form-group">
-                    <label for="exampleFormControlFile1">Изображения</label>
-                    <input type="file" multiple class="form-control-file" id="exampleFormControlFile1">
-                </div>
-
-                <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" disabled>Создать</button>
-            </form>
+                {{ form_row(form.images, {
+                    required: false,
+                    disabled: app.user.subscription.level == FREE
+                }) }}
+                {{ form_row(form._token) }}
+                <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Создать</button>
+            {{ form_end(form, { render_rest: false }) }}
         </div>
     </div>
 
     <hr>
+    {% if content is not null %}
 
     <h2 class="mt-4">Ваша статья</h2>
 
@@ -128,36 +131,17 @@
 
         <div class="col-xl-6">
 
-            <h1 class="mt-4">Тестовая статья</h1>
-            <div class="media">
-                <img class="mr-3" src="https://via.placeholder.com/250x250" width="250" height="250" alt="">
-                <div class="media-body">
-                    <p>Lorem Ipsum <b>EXAMPLE</b> dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    <p>Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. <b>EXAMPLE</b> Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-sm-6">
-                    <p>Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore <b>EXAMPLE</b> magna <b>EXAMPLE</b> aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex <b>EXAMPLE</b> ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                </div>
-                <div class="col-sm-6">
-                    <p>Lorem Ipsum dolor sit amet, consectetur adipiscing elit <b>EXAMPLE</b>, sed do eiusmod tempor incididunt ut labore et dolore magna <b>EXAMPLE</b> aliqua. </p>
-                    <p>Lorem Ipsum dolor sit amet, consectetur <b>EXAMPLE</b> adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore <b>EXAMPLE</b> magna <b>EXAMPLE</b> aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex <b>EXAMPLE</b> ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                </div>
-            </div>
-
-            <div class="media">
-                <div class="media-body">
-                    <p>Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    <p>Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad <b>EXAMPLE</b> minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                </div>
-                <img class="ml-3" src="https://via.placeholder.com/250x250" width="250" height="250" alt="">
-            </div>
-
-            <h3>Eheu, domina!</h3>
-            <p><b>EXAMPLE</b> Lorem Ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            {{ content|raw }}
         </div>
 
     </div>
+    {% endif %}
 {% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% if app.user.subscription.level != FREE  %}
+        <script src="{{ asset('js/dashboard_create_article.js') }}"></script>
+    {% endif %}
+{% endblock %}
+
