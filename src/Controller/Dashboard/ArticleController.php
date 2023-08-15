@@ -4,6 +4,7 @@ namespace App\Controller\Dashboard;
 
 use App\Entity\Dto\PromotedWord;
 use App\Entity\ValueObject\ArticleGenerateOptions;
+use App\Entity\ValueObject\Subscription;
 use App\Form\CreateArticleFormType;
 use App\Service\ArticleContentGenerator\ArticleContentGenerator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -50,7 +51,10 @@ class ArticleController extends AbstractController
 
             $data->setPromotedWords($promotedWords);
 
-            $article = $articleContentGenerator->generate($data, false);
+            $article = $articleContentGenerator->generate(
+                $data,
+                $this->getUser()->getSubscription()->getLevel() !== Subscription::FREE
+            );
             $session->set('article_content', $article['content']);
 
             return $this->redirectToRoute('app_dashboard_article_create');
