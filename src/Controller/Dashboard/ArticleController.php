@@ -2,10 +2,16 @@
 
 namespace App\Controller\Dashboard;
 
+use App\Entity\Article;
 use App\Entity\Dto\PromotedWord;
+use App\Entity\User;
 use App\Entity\ValueObject\ArticleGenerateOptions;
+use App\Entity\ValueObject\Subscription;
 use App\Form\CreateArticleFormType;
 use App\Service\ArticleContentGenerator\ArticleContentGenerator;
+use App\Service\ArticleService;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,13 +29,19 @@ class ArticleController extends AbstractController
      * @Route("/dashboard/articles/create", name="app_dashboard_article_create")
      * @param Request $request
      * @param ArticleContentGenerator $articleContentGenerator
+     * @param ArticleService $articleService
      *
      * @return Response
      * @throws LoaderError
      * @throws SyntaxError
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
-    public function create(Request $request, ArticleContentGenerator $articleContentGenerator): Response
-    {
+    public function create(
+        Request $request,
+        ArticleContentGenerator $articleContentGenerator,
+        ArticleService $articleService
+    ): Response {
         $form = $this->createForm(CreateArticleFormType::class);
         $form->handleRequest($request);
 
@@ -49,9 +61,28 @@ class ArticleController extends AbstractController
             );
 
             $data->setPromotedWords($promotedWords);
+            /** @var User $user */
+            $user = $this->getUser();
 
-            $article = $articleContentGenerator->generate($data, false);
-            $session->set('article_content', $article['content']);
+            $article = $articleContentGenerator->generate(
+                $data,
+                $user->getSubscription()->getLevel() !== Subscription::FREE
+            );
+
+            $article = (new Article())
+                ->setTitle($article['title'])
+                ->setContent($article['content'])
+                ->setGenerateOptions($data)
+                ->setAuthor($user)
+            ;
+
+            if (!$articleService->save($article)) {
+                $request->getSession()->getFlashBag()->set('error', true);
+
+                return $this->redirectToRoute('app_dashboard_article_create');
+            };
+
+            $session->set('article_content', $article->getContent());
 
             return $this->redirectToRoute('app_dashboard_article_create');
         }
