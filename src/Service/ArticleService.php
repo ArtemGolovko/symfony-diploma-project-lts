@@ -3,7 +3,11 @@
 namespace App\Service;
 
 use App\Entity\Article;
+use App\Entity\ValueObject\Subscription;
+use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 
 class ArticleService
 {
@@ -13,20 +17,36 @@ class ArticleService
     private EntityManagerInterface $em;
 
     /**
-     * @param EntityManagerInterface $em
+     * @var ArticleRepository
      */
-    public function __construct(EntityManagerInterface $em)
+    private ArticleRepository $articleRepository;
+
+    /**
+     * @param EntityManagerInterface $em
+     * @param ArticleRepository      $articleRepository
+     */
+    public function __construct(EntityManagerInterface $em, ArticleRepository $articleRepository)
     {
         $this->em = $em;
+        $this->articleRepository = $articleRepository;
     }
 
     /**
      * @param Article $article
      *
      * @return bool
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function save(Article $article): bool
     {
+        $author = $article->getAuthor();
+        $count = $this->articleRepository->findHoursCountByAuthor($author);
+
+        if ($author->getSubscription()->getLevel() !== Subscription::PRO && $count >= 2) {
+            return false;
+        }
+
         $this->em->persist($article);
         $this->em->flush();
 

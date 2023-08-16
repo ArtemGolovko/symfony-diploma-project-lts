@@ -10,6 +10,8 @@ use App\Entity\ValueObject\Subscription;
 use App\Form\CreateArticleFormType;
 use App\Service\ArticleContentGenerator\ArticleContentGenerator;
 use App\Service\ArticleService;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,10 +29,13 @@ class ArticleController extends AbstractController
      * @Route("/dashboard/articles/create", name="app_dashboard_article_create")
      * @param Request $request
      * @param ArticleContentGenerator $articleContentGenerator
+     * @param ArticleService $articleService
      *
      * @return Response
      * @throws LoaderError
      * @throws SyntaxError
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
     public function create(
         Request $request,
@@ -64,8 +69,6 @@ class ArticleController extends AbstractController
                 $user->getSubscription()->getLevel() !== Subscription::FREE
             );
 
-            $session->set('article_content', $article['content']);
-
             $article = (new Article())
                 ->setTitle($article['title'])
                 ->setContent($article['content'])
@@ -73,7 +76,13 @@ class ArticleController extends AbstractController
                 ->setAuthor($user)
             ;
 
-            $articleService->save($article);
+            if (!$articleService->save($article)) {
+                $request->getSession()->getFlashBag()->set('error', true);
+
+                return $this->redirectToRoute('app_dashboard_article_create');
+            };
+
+            $session->set('article_content', $article->getContent());
 
             return $this->redirectToRoute('app_dashboard_article_create');
         }
