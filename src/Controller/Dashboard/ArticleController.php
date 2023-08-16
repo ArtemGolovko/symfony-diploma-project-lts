@@ -2,11 +2,14 @@
 
 namespace App\Controller\Dashboard;
 
+use App\Entity\Article;
 use App\Entity\Dto\PromotedWord;
+use App\Entity\User;
 use App\Entity\ValueObject\ArticleGenerateOptions;
 use App\Entity\ValueObject\Subscription;
 use App\Form\CreateArticleFormType;
 use App\Service\ArticleContentGenerator\ArticleContentGenerator;
+use App\Service\ArticleService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,8 +32,11 @@ class ArticleController extends AbstractController
      * @throws LoaderError
      * @throws SyntaxError
      */
-    public function create(Request $request, ArticleContentGenerator $articleContentGenerator): Response
-    {
+    public function create(
+        Request $request,
+        ArticleContentGenerator $articleContentGenerator,
+        ArticleService $articleService
+    ): Response {
         $form = $this->createForm(CreateArticleFormType::class);
         $form->handleRequest($request);
 
@@ -50,12 +56,24 @@ class ArticleController extends AbstractController
             );
 
             $data->setPromotedWords($promotedWords);
+            /** @var User $user */
+            $user = $this->getUser();
 
             $article = $articleContentGenerator->generate(
                 $data,
-                $this->getUser()->getSubscription()->getLevel() !== Subscription::FREE
+                $user->getSubscription()->getLevel() !== Subscription::FREE
             );
+
             $session->set('article_content', $article['content']);
+
+            $article = (new Article())
+                ->setTitle($article['title'])
+                ->setContent($article['content'])
+                ->setGenerateOptions($data)
+                ->setAuthor($user)
+            ;
+
+            $articleService->save($article);
 
             return $this->redirectToRoute('app_dashboard_article_create');
         }
