@@ -8,6 +8,7 @@ use App\Service\ArticleContentGenerator\Module\ModuleInterface;
 use App\Service\ArticleContentGenerator\Module\ModuleProviderInterface;
 use App\Service\ArticleContentGenerator\Theme\Theme;
 use App\Service\ArticleContentGenerator\Theme\ThemeChain;
+use App\Service\ImageAssetService;
 use App\Twig\ArticleGeneratorExtension;
 use App\Twig\Wrapper\ImagesWrapper;
 use App\Twig\Wrapper\KeywordWrapper;
@@ -37,11 +38,20 @@ class ArticleContentGenerator
     private Environment $twig;
 
     /**
+     * @var ImageAssetService
+     */
+    private ImageAssetService $asset;
+
+    /**
      * @param ThemeChain              $themeProvider
      * @param ModuleProviderInterface $moduleProvider
+     * @param ImageAssetService       $asset
      */
-    public function __construct(ThemeChain $themeProvider, ModuleProviderInterface $moduleProvider)
-    {
+    public function __construct(
+        ThemeChain $themeProvider,
+        ModuleProviderInterface $moduleProvider,
+        ImageAssetService $asset
+    ) {
         $this->themeProvider = $themeProvider;
         $this->moduleProvider = $moduleProvider;
 
@@ -51,6 +61,7 @@ class ArticleContentGenerator
         $twig->addExtension(new ArticleGeneratorExtension());
 
         $this->twig = $twig;
+        $this->asset = $asset;
     }
 
     /**
@@ -291,7 +302,9 @@ class ArticleContentGenerator
     private function getImages(Theme $theme, array $images): array
     {
         if (count($images) > 0) {
-            return $images;
+            return array_map(function (string $filename) {
+                return $this->asset->getImageUrl($filename);
+            }, $images);
         }
 
         $imagesAmount = random_int(1, 5);
