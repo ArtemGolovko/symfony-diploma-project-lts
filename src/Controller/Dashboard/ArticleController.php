@@ -134,8 +134,10 @@ class ArticleController extends AbstractController
      * @Route("/dashboard/articles/{id}", name="app_dashboard_article_show")
      * @return Response
      */
-    public function show(): Response
+    public function show(Article $article): Response
     {
-        return $this->render('dashboard/article/show.html.twig');
+        return $this->render('dashboard/article/show.html.twig', [
+            'article' => $article,
+        ]);
     }
 }
