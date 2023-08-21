@@ -1,0 +1,8 @@
+oneup_flysystem:
+    adapters:
+        uploads_images_adapter:
+            local:
+                location: '%app.images_uploads_dir%'
+    filesystems:
+        uploads_images:
+            adapter: uploads_images_adapter

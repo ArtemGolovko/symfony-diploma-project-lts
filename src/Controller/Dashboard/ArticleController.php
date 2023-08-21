@@ -10,10 +10,13 @@ use App\Entity\ValueObject\Subscription;
 use App\Form\CreateArticleFormType;
 use App\Service\ArticleContentGenerator\ArticleContentGenerator;
 use App\Service\ArticleService;
+use App\Service\ImageUploadService;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
+use League\Flysystem\FilesystemException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -30,17 +33,20 @@ class ArticleController extends AbstractController
      * @param Request $request
      * @param ArticleContentGenerator $articleContentGenerator
      * @param ArticleService $articleService
+     * @param ImageUploadService $imageUploadService
      *
      * @return Response
      * @throws LoaderError
-     * @throws SyntaxError
      * @throws NoResultException
      * @throws NonUniqueResultException
+     * @throws SyntaxError
+     * @throws FilesystemException
      */
     public function create(
         Request $request,
         ArticleContentGenerator $articleContentGenerator,
-        ArticleService $articleService
+        ArticleService $articleService,
+        ImageUploadService $imageUploadService
     ): Response {
         $form = $this->createForm(CreateArticleFormType::class);
         $form->handleRequest($request);
@@ -58,6 +64,12 @@ class ArticleController extends AbstractController
                 function (PromotedWord $promotedWord): bool {
                     return !$promotedWord->isEmpty();
                 }
+            );
+
+            $data->setImages(
+                array_map(function (UploadedFile $file) use ($imageUploadService) {
+                    return $imageUploadService->upload($file);
+                }, $form->get('images')->getData())
             );
 
             $data->setPromotedWords($promotedWords);

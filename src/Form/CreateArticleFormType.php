@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\All;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Image;
 
 class CreateArticleFormType extends AbstractType implements DataMapperInterface
@@ -72,7 +73,17 @@ class CreateArticleFormType extends AbstractType implements DataMapperInterface
             ])
             ->add('images', FileType::class, [
                 'multiple' => true,
-                'constraints' => new All(new Image()),
+                'constraints' => [
+                    new All(
+                        new Image([
+                            'allowPortrait' => false,
+                            'allowSquare' => true,
+                            'allowLandscape' => true,
+                            'maxSize' => '1M',
+                        ])
+                    ),
+                    new Count(['max' => 5]),
+                ],
                 'mapped' => false,
             ])
             ->setDataMapper($this)

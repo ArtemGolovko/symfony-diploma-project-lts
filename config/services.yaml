@@ -6,6 +6,10 @@
 parameters:
     app.resources_dir: 'resources/'
     article_content_generator.modules_dir: 'modules/'
+    app.images_uploads: 'uploads/images'
+    app.images_uploads_dir: '%kernel.project_dir%/public/%app.images_uploads%'
+    app.images_uploads_url: '/%app.images_uploads%'
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -13,6 +17,7 @@ services:
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
             App\Service\ArticleContentGenerator\Module\ModuleProviderInterface: '@App\Service\ArticleContentGenerator\Module\ModuleProvider'
+            League\Flysystem\FilesystemOperator: '@oneup_flysystem.uploads_images_filesystem'
 
     _instanceof:
         App\Service\ArticleContentGenerator\Theme\ThemeProviderInterface:
@@ -51,3 +56,7 @@ services:
 
     App\Twig\ArticleGeneratorExtension:
         tags: []
+
+    App\Service\ImageAssetService:
+        arguments:
+            $imagesUrl: '%app.images_uploads_url%'
