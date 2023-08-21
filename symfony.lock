@@ -52,6 +52,9 @@
             "migrations/.gitignore"
         ]
     },
+    "knplabs/knp-paginator-bundle": {
+        "version": "v5.9.0"
+    },
     "oneup/flysystem-bundle": {
         "version": "4.4",
         "recipe": {

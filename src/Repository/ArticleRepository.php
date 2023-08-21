@@ -7,6 +7,7 @@ use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 class ArticleRepository extends ServiceEntityRepository
@@ -38,6 +39,22 @@ class ArticleRepository extends ServiceEntityRepository
             ])
             ->getQuery()
             ->getSingleScalarResult()
+        ;
+    }
+
+    /**
+     * @param User $author
+     *
+     * @return Query
+     */
+    public function findByAuthorQuery(User $author): Query
+    {
+        return $this
+            ->createQueryBuilder('a')
+            ->andWhere('a.author = :author')
+            ->setParameter('author', $author)
+            ->orderBy('a.createdAt', 'desc')
+            ->getQuery()
         ;
     }
 }
