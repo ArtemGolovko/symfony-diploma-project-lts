@@ -87,6 +87,8 @@ class PromotedWord implements \Serializable, \Stringable
      */
     public function unserialize($data): void
     {
+        $this->repetitions = 0;
+        $this->word = '';
         sscanf($data, "%d:%s", $this->repetitions, $this->word);
     }
 

@@ -50,8 +50,19 @@ class ArticleController extends AbstractController
         ArticleService $articleService,
         ImageUploadService $imageUploadService
     ): Response {
-        $form = $this->createForm(CreateArticleFormType::class);
+        $formData = null;
+        if ($request->query->has('id') && $request->isMethod(Request::METHOD_GET)) {
+            $article = $this->getDoctrine()->getManager()->find(Article::class, $request->query->getInt('id'));
+            $formData = $article->getGenerateOptions();
+        }
+
+        $form = $this->createForm(CreateArticleFormType::class, $formData);
         $form->handleRequest($request);
+
+        if ($request->query->has('id') && !$form->isSubmitted()) {
+            $article = $this->getDoctrine()->getManager()->find(Article::class, $request->query->getInt('id'));
+            $form->setData($article->getGenerateOptions());
+        }
 
         $session = $request->getSession();
 
