@@ -27,7 +27,10 @@
                     <th scope="row">{{ module.id }}</th>
                     <td>{{ module.name }}</td>
                     <td><pre class="code">{{ module.template }}</pre></td>
-                    <td><a href="#" class="text-danger"><i class="fas fa-trash"></i></a> </td>
+                    <td><a href="{{ path('app_dashboard_module_delete', {
+                            id: module.id,
+                            '_csrf': csrf_token('delete')
+                        }) }}" class="text-danger"><i class="fas fa-trash"></i></a> </td>
                 </tr>
                 {% endfor %}
             </tbody>

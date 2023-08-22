@@ -228,4 +228,50 @@ class ProfileController extends AbstractController
             'pagination' => $pagination,
         ]);
     }
+
+    /**
+     * @Route("/dashboard/modules/{id}/delete", name="app_dashboard_module_delete")
+     * @param Module                 $module
+     * @param EntityManagerInterface $em
+     *
+     * @return Response
+     */
+    public function deleteModule(
+        Module $module,
+        EntityManagerInterface $em,
+        Request $request,
+        CsrfTokenManagerInterface $tokenManager
+    ): Response {
+        $flashBag = $request->getSession()->getFlashBag();
+
+        $token = new CsrfToken('delete', $request->query->get('_csrf', ''));
+
+        if (!$tokenManager->isTokenValid($token)) {
+            $flashBag->add('error', 'Неверный csrf токен.');
+
+            return $this->redirectToRoute('app_dashboard_modules');
+        }
+
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if ($user->getSubscription()->getLevel() !== Subscription::PRO) {
+            $flashBag->add('error', 'Для удаления модулей необходим уровень подписки PRO.');
+
+            return $this->redirectToRoute('app_dashboard_modules');
+        }
+
+        if ($module->getAuthor() !== $user) {
+            $flashBag->add('error', 'Вы не являетесь автором этого модуля.');
+
+            return $this->redirectToRoute('app_dashboard_modules');
+        }
+
+        $em->remove($module);
+        $em->flush();
+
+        $flashBag->add('success', 'Модуль успешно удален.');
+
+        return $this->redirectToRoute('app_dashboard_modules');
+    }
 }
