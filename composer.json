@@ -10,6 +10,7 @@
         "doctrine/doctrine-migrations-bundle": "^2",
         "doctrine/orm": "2.11.*",
         "easybook/slugger": "^1.0",
+        "knplabs/knp-paginator-bundle": "^5.9",
         "oneup/flysystem-bundle": "^4.4",
         "sensio/framework-extra-bundle": "^6.2",
         "symfony/asset": "4.4.*",

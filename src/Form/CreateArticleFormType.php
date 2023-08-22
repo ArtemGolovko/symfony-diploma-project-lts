@@ -45,6 +45,16 @@ class CreateArticleFormType extends AbstractType implements DataMapperInterface
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $keywords = [];
+        /** @var ArticleGenerateOptions|null $data */
+        $data = $options['data'] ?? null;
+
+        if (null !== $data) {
+            $keywords = $data->getKeywords();
+        }
+
+        $keywords = array_pad($keywords, 7, '');
+
         $builder
             ->add('theme', ChoiceType::class, [
                 'choices' => $this->themeProvider->getThemeNames(),
@@ -56,7 +66,7 @@ class CreateArticleFormType extends AbstractType implements DataMapperInterface
                 'entry_type' => TextType::class,
                 'allow_add' => false,
                 'allow_delete' => false,
-                'data' => array_fill(0, 7, ''),
+                'data' => $keywords,
             ])
             ->add('title', TextType::class)
             ->add('size_begin', NumberType::class)

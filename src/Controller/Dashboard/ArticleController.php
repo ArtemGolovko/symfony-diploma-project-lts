@@ -8,11 +8,13 @@ use App\Entity\User;
 use App\Entity\ValueObject\ArticleGenerateOptions;
 use App\Entity\ValueObject\Subscription;
 use App\Form\CreateArticleFormType;
+use App\Repository\ArticleRepository;
 use App\Service\ArticleContentGenerator\ArticleContentGenerator;
 use App\Service\ArticleService;
 use App\Service\ImageUploadService;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
+use Knp\Component\Pager\PaginatorInterface;
 use League\Flysystem\FilesystemException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -30,10 +32,10 @@ class ArticleController extends AbstractController
 {
     /**
      * @Route("/dashboard/articles/create", name="app_dashboard_article_create")
-     * @param Request $request
+     * @param Request                 $request
      * @param ArticleContentGenerator $articleContentGenerator
-     * @param ArticleService $articleService
-     * @param ImageUploadService $imageUploadService
+     * @param ArticleService          $articleService
+     * @param ImageUploadService      $imageUploadService
      *
      * @return Response
      * @throws LoaderError
@@ -48,8 +50,19 @@ class ArticleController extends AbstractController
         ArticleService $articleService,
         ImageUploadService $imageUploadService
     ): Response {
-        $form = $this->createForm(CreateArticleFormType::class);
+        $formData = null;
+        if ($request->query->has('id') && $request->isMethod(Request::METHOD_GET)) {
+            $article = $this->getDoctrine()->getManager()->find(Article::class, $request->query->getInt('id'));
+            $formData = $article->getGenerateOptions();
+        }
+
+        $form = $this->createForm(CreateArticleFormType::class, $formData);
         $form->handleRequest($request);
+
+        if ($request->query->has('id') && !$form->isSubmitted()) {
+            $article = $this->getDoctrine()->getManager()->find(Article::class, $request->query->getInt('id'));
+            $form->setData($article->getGenerateOptions());
+        }
 
         $session = $request->getSession();
 
@@ -109,19 +122,33 @@ class ArticleController extends AbstractController
 
     /**
      * @Route("/dashboard/history", name="app_dashboard_history")
+     * @param Request            $request
+     * @param ArticleRepository  $articleRepository
+     * @param PaginatorInterface $paginator
+     *
      * @return Response
      */
-    public function history(): Response
-    {
-        return $this->render('dashboard/article/history.html.twig');
+    public function history(
+        Request $request,
+        ArticleRepository $articleRepository,
+        PaginatorInterface $paginator
+    ): Response {
+        $articles = $articleRepository->findByAuthorQuery($this->getUser());
+        $pagination = $paginator->paginate($articles, $request->query->getInt('page', 1), 10);
+
+        return $this->render('dashboard/article/history.html.twig', [
+            'pagination' => $pagination,
+        ]);
     }
 
     /**
      * @Route("/dashboard/articles/{id}", name="app_dashboard_article_show")
      * @return Response
      */
-    public function show(): Response
+    public function show(Article $article): Response
     {
-        return $this->render('dashboard/article/show.html.twig');
+        return $this->render('dashboard/article/show.html.twig', [
+            'article' => $article,
+        ]);
     }
 }
