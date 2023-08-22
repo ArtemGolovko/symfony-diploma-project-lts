@@ -8,6 +8,7 @@ use App\Entity\ValueObject\Subscription;
 use App\Form\CreateModuleFormType;
 use App\Form\Model\ProfileFormModel;
 use App\Form\ProfileFormType;
+use App\Repository\ArticleRepository;
 use App\Service\SubscriptionService;
 use App\Service\Verification\Exception\NewEmailAlreadyVerifiedException;
 use App\Service\Verification\VerifyNewEmailService;
@@ -38,9 +39,18 @@ class ProfileController extends AbstractController
      *
      * @return Response
      */
-    public function dashboard(SessionInterface $session, SubscriptionService $subscriptionService): Response
-    {
+    public function dashboard(
+        SessionInterface $session,
+        SubscriptionService $subscriptionService,
+        ArticleRepository $articleRepository
+    ): Response {
+        /** @var User $user */
+        $user = $this->getUser();
+
         $diffInDays = $subscriptionService->expiresInDays($this->getUser()->getSubscription());
+        $monthsCount = $articleRepository->findMouthsCountByAuthor($user);
+        $totalCount = $articleRepository->findTotalCountbyAuthor($user);
+        $article = $articleRepository->findLatestByAuthor($user);
 
         if ($diffInDays && $diffInDays < 3) {
             $session->getFlashBag()->add(
@@ -49,7 +59,11 @@ class ProfileController extends AbstractController
             );
         }
 
-        return $this->render('dashboard/profile/dashboard.html.twig');
+        return $this->render('dashboard/profile/dashboard.html.twig', [
+            'monthCount' => $monthsCount,
+            'totalCount' => $totalCount,
+            'article' => $article,
+        ]);
     }
 
     /**
