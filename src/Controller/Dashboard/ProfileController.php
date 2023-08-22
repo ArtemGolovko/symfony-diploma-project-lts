@@ -2,12 +2,17 @@
 
 namespace App\Controller\Dashboard;
 
+use App\Entity\Module;
 use App\Entity\User;
+use App\Entity\ValueObject\Subscription;
+use App\Form\CreateModuleFormType;
 use App\Form\Model\ProfileFormModel;
 use App\Form\ProfileFormType;
 use App\Service\SubscriptionService;
 use App\Service\Verification\Exception\NewEmailAlreadyVerifiedException;
 use App\Service\Verification\VerifyNewEmailService;
+use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -177,10 +182,50 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/dashboard/modules", name="app_dashboard_modules")
+     * @param Request                $request
+     * @param EntityManagerInterface $em
+     * @param PaginatorInterface     $paginator
+     *
      * @return Response
      */
-    public function modules(): Response
+    public function modules(Request $request, EntityManagerInterface $em, PaginatorInterface $paginator): Response
     {
-        return $this->render('dashboard/profile/modules.html.twig');
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $form = $this->createForm(CreateModuleFormType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($user->getSubscription()->getLevel() !== Subscription::PRO) {
+                $request->getSession()->getFlashBag()->add(
+                    'error',
+                    'Для добавления модулей необходим уровень подписки PRO.'
+                );
+
+                return $this->redirectToRoute('app_dashboard_modules');
+            }
+
+            /** @var Module $module */
+            $module = $form->getData();
+            $module->setAuthor($user);
+
+            $em->persist($module);
+            $em->flush();
+
+            $request->getSession()->getFlashBag()->add('success', 'Модуль успешно добавлен');
+
+            return $this->redirectToRoute('app_dashboard_modules');
+        }
+
+        $modulesRepository = $em->getRepository(Module::class);
+        $modules = $modulesRepository->findByAuthorQuery($user);
+
+        $pagination = $paginator->paginate($modules, $request->query->getInt('page', 1), 10);
+
+        return $this->render('dashboard/profile/modules.html.twig', [
+            'form' => $form->createView(),
+            'pagination' => $pagination,
+        ]);
     }
 }
