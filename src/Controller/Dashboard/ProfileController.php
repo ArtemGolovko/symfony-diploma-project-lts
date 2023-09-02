@@ -9,6 +9,7 @@ use App\Form\CreateModuleFormType;
 use App\Form\Model\ProfileFormModel;
 use App\Form\ProfileFormType;
 use App\Service\ArticleService;
+use App\Service\ModuleService;
 use App\Service\SubscriptionService;
 use App\Service\Verification\Exception\NewEmailAlreadyVerifiedException;
 use App\Service\Verification\VerifyNewEmailService;
@@ -196,13 +197,13 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/dashboard/modules", name="app_dashboard_modules")
-     * @param Request                $request
-     * @param EntityManagerInterface $em
-     * @param PaginatorInterface     $paginator
+     * @param Request            $request
+     * @param ModuleService      $moduleService
+     * @param PaginatorInterface $paginator
      *
      * @return Response
      */
-    public function modules(Request $request, EntityManagerInterface $em, PaginatorInterface $paginator): Response
+    public function modules(Request $request, ModuleService $moduleService, PaginatorInterface $paginator): Response
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -223,19 +224,18 @@ class ProfileController extends AbstractController
             /** @var Module $module */
             $module = $form->getData();
             $module->setAuthor($user);
-
-            $em->persist($module);
-            $em->flush();
+            $moduleService->save($module);
 
             $request->getSession()->getFlashBag()->add('success', 'Модуль успешно добавлен');
 
             return $this->redirectToRoute('app_dashboard_modules');
         }
 
-        $modulesRepository = $em->getRepository(Module::class);
-        $modules = $modulesRepository->findByAuthorQuery($user);
-
-        $pagination = $paginator->paginate($modules, $request->query->getInt('page', 1), 10);
+        $pagination = $paginator->paginate(
+            $moduleService->getModulesForUserQuery($user),
+            $request->query->getInt('page', 1),
+            10
+        );
 
         return $this->render('dashboard/profile/modules.html.twig', [
             'form' => $form->createView(),
