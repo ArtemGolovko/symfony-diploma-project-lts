@@ -5,6 +5,7 @@ namespace App\Security;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\RedirectService;
+use App\Service\ValidateCsrfTokenTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -14,12 +15,12 @@ use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
 
 class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
 {
+    use ValidateCsrfTokenTrait;
+
     public const LOGIN_ROUTE = 'app_login';
 
     /**
@@ -31,11 +32,6 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
      * @var UrlGeneratorInterface
      */
     private UrlGeneratorInterface $urlGenerator;
-
-    /**
-     * @var CsrfTokenManagerInterface
-     */
-    private CsrfTokenManagerInterface $csrfTokenManager;
 
     /**
      * @var UserPasswordEncoderInterface
@@ -50,20 +46,17 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
     /**
      * @param UserRepository               $userRepository
      * @param UrlGeneratorInterface        $urlGenerator
-     * @param CsrfTokenManagerInterface    $csrfTokenManager
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @param RedirectService              $redirectService
      */
     public function __construct(
         UserRepository $userRepository,
         UrlGeneratorInterface $urlGenerator,
-        CsrfTokenManagerInterface $csrfTokenManager,
         UserPasswordEncoderInterface $passwordEncoder,
         RedirectService $redirectService
     ) {
         $this->userRepository = $userRepository;
         $this->urlGenerator = $urlGenerator;
-        $this->csrfTokenManager = $csrfTokenManager;
         $this->passwordEncoder = $passwordEncoder;
         $this->redirectService = $redirectService;
     }
@@ -125,8 +118,7 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
      */
     public function getUser($credentials, UserProviderInterface $userProvider): User
     {
-        $csrfToken = new CsrfToken('authenticate', $credentials['csrf_token']);
-        if (!$this->csrfTokenManager->isTokenValid($csrfToken)) {
+        if (!$this->validateToken('authenticate', $credentials['csrf_token'])) {
             throw new InvalidCsrfTokenException();
         }
 

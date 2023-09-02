@@ -11,6 +11,7 @@ use App\Form\ProfileFormType;
 use App\Service\ArticleService;
 use App\Service\ModuleService;
 use App\Service\SubscriptionService;
+use App\Service\ValidateCsrfTokenTrait;
 use App\Service\Verification\Exception\NewEmailAlreadyVerifiedException;
 use App\Service\Verification\VerifyNewEmailService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,8 +24,6 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\ExpiredSignatureException;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
@@ -33,6 +32,8 @@ use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
  */
 class ProfileController extends AbstractController
 {
+    use ValidateCsrfTokenTrait;
+
     /**
      * @Route("/dashboard", name="app_dashboard")
      * @param FlashBagInterface   $flashBag
@@ -78,23 +79,20 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/dashboard/order-subscription/{level}", name="app_dashboard_request_subscription")
-     * @param string                    $level
-     * @param Request                   $request
-     * @param CsrfTokenManagerInterface $manager
-     * @param SubscriptionService       $subscriptionService
+     * @param string              $level
+     * @param Request             $request
+     * @param SubscriptionService $subscriptionService
      *
      * @return Response
      */
     public function requestSubscription(
         string $level,
         Request $request,
-        CsrfTokenManagerInterface $manager,
         SubscriptionService $subscriptionService
     ): Response {
-        $csrfToken = new CsrfToken('request', $request->query->get('_csrf', ''));
         $flashBug = $request->getSession()->getFlashBag();
 
-        if ($manager->isTokenValid($csrfToken)) {
+        if ($this->validateToken('request', $request->query->get('_csrf', ''))) {
             $user = $this->getUser();
             $subscriptionService->upgrade($user, $level);
 
@@ -253,14 +251,11 @@ class ProfileController extends AbstractController
     public function deleteModule(
         Module $module,
         EntityManagerInterface $em,
-        Request $request,
-        CsrfTokenManagerInterface $tokenManager
+        Request $request
     ): Response {
         $flashBag = $request->getSession()->getFlashBag();
 
-        $token = new CsrfToken('delete', $request->query->get('_csrf', ''));
-
-        if (!$tokenManager->isTokenValid($token)) {
+        if (!$this->validateToken('delete', $request->query->get('_csrf', ''))) {
             $flashBag->add('error', 'Неверный csrf токен.');
 
             return $this->redirectToRoute('app_dashboard_modules');
