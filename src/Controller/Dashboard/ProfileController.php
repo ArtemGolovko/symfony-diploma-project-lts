@@ -8,7 +8,7 @@ use App\Entity\ValueObject\Subscription;
 use App\Form\CreateModuleFormType;
 use App\Form\Model\ProfileFormModel;
 use App\Form\ProfileFormType;
-use App\Repository\ArticleRepository;
+use App\Service\ArticleService;
 use App\Service\SubscriptionService;
 use App\Service\Verification\Exception\NewEmailAlreadyVerifiedException;
 use App\Service\Verification\VerifyNewEmailService;
@@ -18,7 +18,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -34,34 +34,34 @@ class ProfileController extends AbstractController
 {
     /**
      * @Route("/dashboard", name="app_dashboard")
-     * @param SessionInterface    $session
+     * @param FlashBagInterface   $flashBag
      * @param SubscriptionService $subscriptionService
+     * @param ArticleService      $articleService
      *
      * @return Response
      */
     public function dashboard(
-        SessionInterface $session,
+        FlashBagInterface $flashBag,
         SubscriptionService $subscriptionService,
-        ArticleRepository $articleRepository
+        ArticleService $articleService
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
 
         $diffInDays = $subscriptionService->expiresInDays($this->getUser()->getSubscription());
-        $monthsCount = $articleRepository->findMouthsCountByAuthor($user);
-        $totalCount = $articleRepository->findTotalCountbyAuthor($user);
-        $article = $articleRepository->findLatestByAuthor($user);
+        $statistics = $articleService->getStatisticsForUser($user);
+        $article = $articleService->getLatestForUser($user);
 
         if ($diffInDays && $diffInDays < 3) {
-            $session->getFlashBag()->add(
+            $flashBag->add(
                 'warning',
                 sprintf("Подписка истекает через %d %s", $diffInDays, ($diffInDays === 1) ? "день" : "дня")
             );
         }
 
         return $this->render('dashboard/profile/dashboard.html.twig', [
-            'monthCount' => $monthsCount,
-            'totalCount' => $totalCount,
+            'monthCount' => $statistics['monthsCount'],
+            'totalCount' => $statistics['totalCount'],
             'article' => $article,
         ]);
     }
