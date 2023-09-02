@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Module;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 class ModuleRepository extends ServiceEntityRepository
@@ -17,7 +18,12 @@ class ModuleRepository extends ServiceEntityRepository
         parent::__construct($registry, Module::class);
     }
 
-    public function findByAuthorQuery(User $author)
+    /**
+     * @param User $author
+     *
+     * @return Query
+     */
+    public function findByAuthorQuery(User $author): Query
     {
         return $this
             ->createQueryBuilder('m')

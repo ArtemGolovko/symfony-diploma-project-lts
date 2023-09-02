@@ -50,4 +50,15 @@ class ModuleService
         $this->em->persist($module);
         $this->em->flush();
     }
+
+    /**
+     * @param Module $module
+     *
+     * @return void
+     */
+    public function remove(Module $module): void
+    {
+        $this->em->remove($module);
+        $this->em->flush();
+    }
 }

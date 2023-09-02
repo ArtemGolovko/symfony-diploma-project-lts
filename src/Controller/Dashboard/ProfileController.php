@@ -14,7 +14,6 @@ use App\Service\SubscriptionService;
 use App\Service\ValidateCsrfTokenTrait;
 use App\Service\Verification\Exception\NewEmailAlreadyVerifiedException;
 use App\Service\Verification\VerifyNewEmailService;
-use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -243,14 +242,15 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/dashboard/modules/{id}/delete", name="app_dashboard_module_delete")
-     * @param Module                 $module
-     * @param EntityManagerInterface $em
+     * @param Module        $module
+     * @param ModuleService $moduleService
+     * @param Request       $request
      *
      * @return Response
      */
     public function deleteModule(
         Module $module,
-        EntityManagerInterface $em,
+        ModuleService $moduleService,
         Request $request
     ): Response {
         $flashBag = $request->getSession()->getFlashBag();
@@ -276,9 +276,7 @@ class ProfileController extends AbstractController
             return $this->redirectToRoute('app_dashboard_modules');
         }
 
-        $em->remove($module);
-        $em->flush();
-
+        $moduleService->remove($module);
         $flashBag->add('success', 'Модуль успешно удален.');
 
         return $this->redirectToRoute('app_dashboard_modules');
