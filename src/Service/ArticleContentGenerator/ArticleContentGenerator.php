@@ -117,6 +117,33 @@ class ArticleContentGenerator
     }
 
     /**
+     * @param string $title
+     * @param string $keyword
+     *
+     * @return string
+     * @throws LoaderError
+     * @throws SyntaxError
+     */
+    public function generateDemo(string $title, string $keyword): string
+    {
+        $themeNames = $this->themeProvider->getThemeNames();
+        $themeName = $themeNames[array_rand($themeNames)];
+
+        $article = $this->generate(
+            new ArticleGenerateOptions(
+                $themeName,
+                [$keyword],
+                new Range(3, 6),
+                [],
+                $title
+            ),
+            false
+        );
+
+        return $article['content'];
+    }
+
+    /**
      * @param $options
      *
      * @return Theme
