@@ -70,7 +70,7 @@ class RedirectService
     ): RedirectResponse {
         $path = $this->getRedirectPath();
 
-        if ($path) {
+        if (!$path) {
             $path = $this->getTargetPath($this->session, self::PROVIDER_KEY) ?? $this->urlGenerator->generate(
                 $defaultRoute,
                 $parameters

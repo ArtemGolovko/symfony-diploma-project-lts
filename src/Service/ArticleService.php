@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Article;
+use App\Entity\User;
 use App\Entity\ValueObject\Subscription;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -51,5 +52,28 @@ class ArticleService
         $this->em->flush();
 
         return true;
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return int[]
+     */
+    public function getStatisticsForUser(User $user): array
+    {
+        return [
+            'monthsCount' => $this->articleRepository->findMouthsCountByAuthor($user),
+            'totalCount' => $this->articleRepository->findTotalCountbyAuthor($user),
+        ];
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return Article|null
+     */
+    public function getLatestForUser(User $user): ?Article
+    {
+        return $this->articleRepository->findLatestByAuthor($user);
     }
 }

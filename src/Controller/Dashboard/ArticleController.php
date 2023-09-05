@@ -143,6 +143,8 @@ class ArticleController extends AbstractController
 
     /**
      * @Route("/dashboard/articles/{id}", name="app_dashboard_article_show")
+     * @param Article $article
+     *
      * @return Response
      */
     public function show(Article $article): Response

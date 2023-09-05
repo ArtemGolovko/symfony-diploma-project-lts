@@ -2,22 +2,27 @@
 
 namespace App\Controller\Dashboard;
 
+use App\Entity\Module;
 use App\Entity\User;
+use App\Entity\ValueObject\Subscription;
+use App\Form\CreateModuleFormType;
 use App\Form\Model\ProfileFormModel;
 use App\Form\ProfileFormType;
+use App\Service\ArticleService;
+use App\Service\ModuleService;
 use App\Service\SubscriptionService;
+use App\Service\ValidateCsrfTokenTrait;
 use App\Service\Verification\Exception\NewEmailAlreadyVerifiedException;
 use App\Service\Verification\VerifyNewEmailService;
+use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\ExpiredSignatureException;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 
@@ -26,25 +31,40 @@ use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
  */
 class ProfileController extends AbstractController
 {
+    use ValidateCsrfTokenTrait;
+
     /**
      * @Route("/dashboard", name="app_dashboard")
-     * @param SessionInterface    $session
+     * @param FlashBagInterface   $flashBag
      * @param SubscriptionService $subscriptionService
+     * @param ArticleService      $articleService
      *
      * @return Response
      */
-    public function dashboard(SessionInterface $session, SubscriptionService $subscriptionService): Response
-    {
+    public function dashboard(
+        FlashBagInterface $flashBag,
+        SubscriptionService $subscriptionService,
+        ArticleService $articleService
+    ): Response {
+        /** @var User $user */
+        $user = $this->getUser();
+
         $diffInDays = $subscriptionService->expiresInDays($this->getUser()->getSubscription());
+        $statistics = $articleService->getStatisticsForUser($user);
+        $article = $articleService->getLatestForUser($user);
 
         if ($diffInDays && $diffInDays < 3) {
-            $session->getFlashBag()->add(
+            $flashBag->add(
                 'warning',
                 sprintf("Подписка истекает через %d %s", $diffInDays, ($diffInDays === 1) ? "день" : "дня")
             );
         }
 
-        return $this->render('dashboard/profile/dashboard.html.twig');
+        return $this->render('dashboard/profile/dashboard.html.twig', [
+            'monthCount' => $statistics['monthsCount'],
+            'totalCount' => $statistics['totalCount'],
+            'article' => $article,
+        ]);
     }
 
     /**
@@ -58,23 +78,20 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/dashboard/order-subscription/{level}", name="app_dashboard_request_subscription")
-     * @param string                    $level
-     * @param Request                   $request
-     * @param CsrfTokenManagerInterface $manager
-     * @param SubscriptionService       $subscriptionService
+     * @param string              $level
+     * @param Request             $request
+     * @param SubscriptionService $subscriptionService
      *
      * @return Response
      */
     public function requestSubscription(
         string $level,
         Request $request,
-        CsrfTokenManagerInterface $manager,
         SubscriptionService $subscriptionService
     ): Response {
-        $csrfToken = new CsrfToken('request', $request->query->get('_csrf', ''));
         $flashBug = $request->getSession()->getFlashBag();
 
-        if ($manager->isTokenValid($csrfToken)) {
+        if ($this->validateToken('request', $request->query->get('_csrf', ''))) {
             $user = $this->getUser();
             $subscriptionService->upgrade($user, $level);
 
@@ -177,10 +194,91 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/dashboard/modules", name="app_dashboard_modules")
+     * @param Request            $request
+     * @param ModuleService      $moduleService
+     * @param PaginatorInterface $paginator
+     *
      * @return Response
      */
-    public function modules(): Response
+    public function modules(Request $request, ModuleService $moduleService, PaginatorInterface $paginator): Response
     {
-        return $this->render('dashboard/profile/modules.html.twig');
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $form = $this->createForm(CreateModuleFormType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($user->getSubscription()->getLevel() !== Subscription::PRO) {
+                $request->getSession()->getFlashBag()->add(
+                    'error',
+                    'Для добавления модулей необходим уровень подписки PRO.'
+                );
+
+                return $this->redirectToRoute('app_dashboard_modules');
+            }
+
+            /** @var Module $module */
+            $module = $form->getData();
+            $module->setAuthor($user);
+            $moduleService->save($module);
+
+            $request->getSession()->getFlashBag()->add('success', 'Модуль успешно добавлен');
+
+            return $this->redirectToRoute('app_dashboard_modules');
+        }
+
+        $pagination = $paginator->paginate(
+            $moduleService->getModulesForUserQuery($user),
+            $request->query->getInt('page', 1),
+            10
+        );
+
+        return $this->render('dashboard/profile/modules.html.twig', [
+            'form' => $form->createView(),
+            'pagination' => $pagination,
+        ]);
+    }
+
+    /**
+     * @Route("/dashboard/modules/{id}/delete", name="app_dashboard_module_delete")
+     * @param Module        $module
+     * @param ModuleService $moduleService
+     * @param Request       $request
+     *
+     * @return Response
+     */
+    public function deleteModule(
+        Module $module,
+        ModuleService $moduleService,
+        Request $request
+    ): Response {
+        $flashBag = $request->getSession()->getFlashBag();
+
+        if (!$this->validateToken('delete', $request->query->get('_csrf', ''))) {
+            $flashBag->add('error', 'Неверный csrf токен.');
+
+            return $this->redirectToRoute('app_dashboard_modules');
+        }
+
+        /** @var User $user */
+        $user = $this->getUser();
+
+        if ($user->getSubscription()->getLevel() !== Subscription::PRO) {
+            $flashBag->add('error', 'Для удаления модулей необходим уровень подписки PRO.');
+
+            return $this->redirectToRoute('app_dashboard_modules');
+        }
+
+        if ($module->getAuthor() !== $user) {
+            $flashBag->add('error', 'Вы не являетесь автором этого модуля.');
+
+            return $this->redirectToRoute('app_dashboard_modules');
+        }
+
+        $moduleService->remove($module);
+        $flashBag->add('success', 'Модуль успешно удален.');
+
+        return $this->redirectToRoute('app_dashboard_modules');
     }
 }

@@ -8,13 +8,13 @@
             <div class="card-columns dashboard">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">13</h5>
+                        <h5 class="card-title">{{ totalCount }}</h5>
                         <p class="card-text">Всего статей создано.</p>
                     </div>
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">8</h5>
+                        <h5 class="card-title">{{ monthCount }}</h5>
                         <p class="card-text">Создано в этом месяце.</p>
                     </div>
                 </div>
@@ -27,16 +27,18 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Создать статью</h5>
-                        <a href="#" class="btn btn-primary">Создать</a>
+                        <a href="{{ path('app_dashboard_article_create') }}" class="btn btn-primary">Создать</a>
                     </div>
                 </div>
+                {% if article %}
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Почему квадрат не круглый?</h5>
-                        <p class="card-text">При генерации контента <b>круг</b> статьи, вы можете наполнить его нужными словами <b>круг</b> для вашего бизнеса. Столько <b>круг</b> сколько <b>круг</b> нужно. Хоть все ими <b>круг</b> <b>круг</b> <b>круг</b> заполоните!.</p>
-                        <a href="#" class="btn btn-primary">Подробнее</a>
+                        <h5 class="card-title">{{ article.title }}</h5>
+                        <p class="card-text">{{ article.content|striptags('<b>')|truncate(223, '...')|raw }}</p>
+                        <a href="{{ path('app_dashboard_article_show', { id: article.id }) }}" class="btn btn-primary">Подробнее</a>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
