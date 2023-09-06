@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\User;
+use App\Service\ApiTokenGeneratorService;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -14,11 +15,20 @@ class UserFixtures extends BaseFixtures
     private UserPasswordEncoderInterface $passwordEncoder;
 
     /**
-     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @var ApiTokenGeneratorService
      */
-    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
-    {
+    private ApiTokenGeneratorService $apiTokenGenerator;
+
+    /**
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param ApiTokenGeneratorService     $apiTokenGenerator
+     */
+    public function __construct(
+        UserPasswordEncoderInterface $passwordEncoder,
+        ApiTokenGeneratorService $apiTokenGenerator
+    ) {
         $this->passwordEncoder = $passwordEncoder;
+        $this->apiTokenGenerator = $apiTokenGenerator;
     }
 
     /**
@@ -35,6 +45,7 @@ class UserFixtures extends BaseFixtures
                 ->setPassword(
                     $this->passwordEncoder->encodePassword($user, 'query')
                 )
+                ->setApiToken($this->apiTokenGenerator->generate())
                 ->setIsVerified(true)
             ;
             if ($this->faker->boolean(30)) {

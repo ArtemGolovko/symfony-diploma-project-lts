@@ -8,6 +8,7 @@ use App\Event\RegistrationSuccessEvent;
 use App\Form\Model\RegistrationFormModel;
 use App\Form\RegistrationFormType;
 use App\Security\LoginFormAuthenticator;
+use App\Service\ApiTokenGeneratorService;
 use App\Service\RedirectService;
 use App\Service\Verification\Exception\UserAlreadyVerifiedException;
 use App\Service\Verification\VerifyEmailService;
@@ -47,11 +48,13 @@ class SecurityController extends AbstractController
     /**
      * @Route("/register", name="app_register")
      * @IsGranted("IS_ANONYMOUS_OR_UNVERIFIED")
-     * @param Request $request
+     *
+     * @param Request                      $request
      * @param UserPasswordEncoderInterface $passwordEncoder
-     * @param GuardAuthenticatorHandler $guard
-     * @param LoginFormAuthenticator $authenticator
-     * @param EventDispatcherInterface $dispatcher
+     * @param GuardAuthenticatorHandler    $guard
+     * @param LoginFormAuthenticator       $authenticator
+     * @param EventDispatcherInterface     $dispatcher
+     * @param ApiTokenGeneratorService     $apiTokenGenerator
      *
      * @return Response
      */
@@ -60,7 +63,8 @@ class SecurityController extends AbstractController
         UserPasswordEncoderInterface $passwordEncoder,
         GuardAuthenticatorHandler $guard,
         LoginFormAuthenticator $authenticator,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
+        ApiTokenGeneratorService $apiTokenGenerator
     ): Response {
         $form = $this->createForm(RegistrationFormType::class);
         $form->handleRequest($request);
@@ -74,6 +78,7 @@ class SecurityController extends AbstractController
                 ->setName($data->name)
                 ->setEmail($data->email)
                 ->setPassword($passwordEncoder->encodePassword($user, $data->plainPassword))
+                ->setApiToken($apiTokenGenerator->generate())
             ;
 
             $em = $this->getDoctrine()->getManager();
