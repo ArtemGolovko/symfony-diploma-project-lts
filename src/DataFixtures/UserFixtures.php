@@ -3,32 +3,22 @@
 namespace App\DataFixtures;
 
 use App\Entity\User;
-use App\Service\ApiTokenGeneratorService;
+use App\Service\UserService;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserFixtures extends BaseFixtures
 {
     /**
-     * @var UserPasswordEncoderInterface
+     * @var UserService
      */
-    private UserPasswordEncoderInterface $passwordEncoder;
+    private UserService $userService;
 
     /**
-     * @var ApiTokenGeneratorService
+     * @param UserService $userService
      */
-    private ApiTokenGeneratorService $apiTokenGenerator;
-
-    /**
-     * @param UserPasswordEncoderInterface $passwordEncoder
-     * @param ApiTokenGeneratorService     $apiTokenGenerator
-     */
-    public function __construct(
-        UserPasswordEncoderInterface $passwordEncoder,
-        ApiTokenGeneratorService $apiTokenGenerator
-    ) {
-        $this->passwordEncoder = $passwordEncoder;
-        $this->apiTokenGenerator = $apiTokenGenerator;
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
     }
 
     /**
@@ -38,16 +28,14 @@ class UserFixtures extends BaseFixtures
      */
     public function loadData(ObjectManager $manager): void
     {
-        $this->createMany(User::class, 10, function (User $user) {
-            $user
-                ->setName($this->faker->firstName)
-                ->setEmail($this->faker->email)
-                ->setPassword(
-                    $this->passwordEncoder->encodePassword($user, 'query')
-                )
-                ->setApiToken($this->apiTokenGenerator->generate())
-                ->setIsVerified(true)
-            ;
+        $this->createMany(User::class, 10, function (User &$user) {
+            $user = $this->userService->create(
+                $this->faker->email,
+                $this->faker->firstName,
+                'query',
+                true
+            );
+            
             if ($this->faker->boolean(30)) {
                 $user
                     ->getSubscription()
