@@ -35,7 +35,7 @@ class UserFixtures extends BaseFixtures
                 'query',
                 true
             );
-            
+
             if ($this->faker->boolean(30)) {
                 $user
                     ->getSubscription()

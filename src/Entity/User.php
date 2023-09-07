@@ -74,8 +74,9 @@ class User implements UserInterface, ReceiverInterface
 
     /**
      * @ORM\Column(type="string", length=32)
+     * @var string
      */
-    private $apiToken;
+    private string $apiToken;
 
     public function __construct()
     {
@@ -121,7 +122,7 @@ class User implements UserInterface, ReceiverInterface
      */
     public function getUsername(): string
     {
-        return (string)$this->email;
+        return $this->email;
     }
 
     /**
@@ -131,7 +132,6 @@ class User implements UserInterface, ReceiverInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
@@ -314,11 +314,19 @@ class User implements UserInterface, ReceiverInterface
         return $this;
     }
 
-    public function getApiToken(): ?string
+    /**
+     * @return string
+     */
+    public function getApiToken(): string
     {
         return $this->apiToken;
     }
 
+    /**
+     * @param string $apiToken
+     *
+     * @return User
+     */
     public function setApiToken(string $apiToken): self
     {
         $this->apiToken = $apiToken;
