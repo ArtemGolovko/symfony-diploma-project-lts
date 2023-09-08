@@ -46,8 +46,13 @@ class UserService
      *
      * @return User
      */
-    public function create(string $email, string $name, string $password, bool $isVerified = false): User
-    {
+    public function create(
+        string $email,
+        string $name,
+        string $password,
+        bool $isVerified = false,
+        bool $flush = true
+    ): User {
         $user = new User();
         $user
             ->setEmail($email)
@@ -57,21 +62,11 @@ class UserService
             ->setIsVerified($isVerified)
         ;
 
-        return $user;
-    }
-
-    /**
-     * @param User $user
-     * @param bool $flush
-     *
-     * @return void
-     */
-    public function save(User $user, bool $flush = true): void
-    {
         $this->em->persist($user);
-
         if ($flush) {
             $this->em->flush();
         }
+
+        return $user;
     }
 }

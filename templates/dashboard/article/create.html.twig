@@ -84,7 +84,7 @@
                                 </div>
                             </div>
                             {% endfor %}
-                            {% if form.promoted_words|length > 1 and app.user.subscription.level != FREE %}
+                            {% if app.user.subscription.level != FREE %}
                             <div class="row">
                                 <div class="col">
                                     <div class="form-label-group">

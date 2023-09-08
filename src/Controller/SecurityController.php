@@ -70,7 +70,6 @@ class SecurityController extends AbstractController
             $data = $form->getData();
 
             $user = $userService->create($data->email, $data->name, $data->plainPassword);
-            $userService->save($user);
 
             $event = new RegistrationSuccessEvent($user, $request);
             $dispatcher->dispatch($event, AppEvents::REGISTRATION_SUCCESS);

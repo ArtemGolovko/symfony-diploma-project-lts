@@ -4,9 +4,11 @@ namespace App\DataFixtures;
 
 use App\Entity\User;
 use App\Service\UserService;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Faker\Factory;
 
-class UserFixtures extends BaseFixtures
+class UserFixtures extends Fixture
 {
     /**
      * @var UserService
@@ -26,25 +28,25 @@ class UserFixtures extends BaseFixtures
      *
      * @return void
      */
-    public function loadData(ObjectManager $manager): void
+    public function load(ObjectManager $manager): void
     {
-        $this->createMany(User::class, 10, function (User &$user) {
-            $user = $this->userService->create(
-                $this->faker->email,
-                $this->faker->firstName,
-                'query',
-                true
-            );
+        $faker = Factory::create();
 
-            if ($this->faker->boolean(30)) {
+        for ($i = 0; $i < 10; $i++) {
+            $user = $this->userService->create($faker->email, $faker->firstName, 'query', true, false);
+
+            if ($faker->boolean(30)) {
                 $user
                     ->getSubscription()
                     ->setLevel(
-                        $this->faker->boolean(30) ? 'PRO' : 'PLUS',
+                        $faker->boolean(30) ? 'PRO' : 'PLUS',
                         new \DateTimeImmutable('+1 week')
                     )
                 ;
             }
-        });
+
+            $this->addReference(User::class . '|' . $i, $user);
+        }
+        $manager->flush();
     }
 }
