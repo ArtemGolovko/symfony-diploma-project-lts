@@ -50,7 +50,7 @@ class UserService
         string $email,
         string $name,
         string $password,
-        bool $isVerified = false,
+        bool $isVerified = false
     ): User {
         $user = new User();
         $user
