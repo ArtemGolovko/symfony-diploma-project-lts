@@ -3,22 +3,24 @@
 namespace App\DataFixtures;
 
 use App\Entity\User;
+use App\Service\UserService;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Faker\Factory;
 
-class UserFixtures extends BaseFixtures
+class UserFixtures extends Fixture
 {
     /**
-     * @var UserPasswordEncoderInterface
+     * @var UserService
      */
-    private UserPasswordEncoderInterface $passwordEncoder;
+    private UserService $userService;
 
     /**
-     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param UserService $userService
      */
-    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(UserService $userService)
     {
-        $this->passwordEncoder = $passwordEncoder;
+        $this->userService = $userService;
     }
 
     /**
@@ -26,26 +28,25 @@ class UserFixtures extends BaseFixtures
      *
      * @return void
      */
-    public function loadData(ObjectManager $manager): void
+    public function load(ObjectManager $manager): void
     {
-        $this->createMany(User::class, 10, function (User $user) {
-            $user
-                ->setName($this->faker->firstName)
-                ->setEmail($this->faker->email)
-                ->setPassword(
-                    $this->passwordEncoder->encodePassword($user, 'query')
-                )
-                ->setIsVerified(true)
-            ;
-            if ($this->faker->boolean(30)) {
+        $faker = Factory::create();
+
+        for ($i = 0; $i < 10; $i++) {
+            $user = $this->userService->create($faker->email, $faker->firstName, 'query', true);
+
+            if ($faker->boolean(30)) {
                 $user
                     ->getSubscription()
                     ->setLevel(
-                        $this->faker->boolean(30) ? 'PRO' : 'PLUS',
+                        $faker->boolean(30) ? 'PRO' : 'PLUS',
                         new \DateTimeImmutable('+1 week')
                     )
                 ;
             }
-        });
+
+            $this->addReference(User::class . '|' . $i, $user);
+        }
+        $manager->flush();
     }
 }

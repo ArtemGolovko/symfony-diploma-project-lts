@@ -3,12 +3,12 @@
 namespace App\Controller;
 
 use App\AppEvents;
-use App\Entity\User;
 use App\Event\RegistrationSuccessEvent;
 use App\Form\Model\RegistrationFormModel;
 use App\Form\RegistrationFormType;
 use App\Security\LoginFormAuthenticator;
 use App\Service\RedirectService;
+use App\Service\UserService;
 use App\Service\Verification\Exception\UserAlreadyVerifiedException;
 use App\Service\Verification\VerifyEmailService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -17,7 +17,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\ExpiredSignatureException;
@@ -47,17 +46,18 @@ class SecurityController extends AbstractController
     /**
      * @Route("/register", name="app_register")
      * @IsGranted("IS_ANONYMOUS_OR_UNVERIFIED")
-     * @param Request $request
-     * @param UserPasswordEncoderInterface $passwordEncoder
+     *
+     * @param Request                   $request
+     * @param UserService               $userService
      * @param GuardAuthenticatorHandler $guard
-     * @param LoginFormAuthenticator $authenticator
-     * @param EventDispatcherInterface $dispatcher
+     * @param LoginFormAuthenticator    $authenticator
+     * @param EventDispatcherInterface  $dispatcher
      *
      * @return Response
      */
     public function register(
         Request $request,
-        UserPasswordEncoderInterface $passwordEncoder,
+        UserService $userService,
         GuardAuthenticatorHandler $guard,
         LoginFormAuthenticator $authenticator,
         EventDispatcherInterface $dispatcher
@@ -69,17 +69,7 @@ class SecurityController extends AbstractController
             /** @var RegistrationFormModel $data */
             $data = $form->getData();
 
-            $user = new User();
-            $user
-                ->setName($data->name)
-                ->setEmail($data->email)
-                ->setPassword($passwordEncoder->encodePassword($user, $data->plainPassword))
-            ;
-
-            $em = $this->getDoctrine()->getManager();
-
-            $em->persist($user);
-            $em->flush();
+            $user = $userService->create($data->email, $data->name, $data->plainPassword);
 
             $event = new RegistrationSuccessEvent($user, $request);
             $dispatcher->dispatch($event, AppEvents::REGISTRATION_SUCCESS);
