@@ -51,7 +51,6 @@ class UserService
         string $name,
         string $password,
         bool $isVerified = false,
-        bool $flush = true
     ): User {
         $user = new User();
         $user
