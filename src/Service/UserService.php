@@ -63,9 +63,7 @@ class UserService
         ;
 
         $this->em->persist($user);
-        if ($flush) {
-            $this->em->flush();
-        }
+        $this->em->flush();
 
         return $user;
     }
