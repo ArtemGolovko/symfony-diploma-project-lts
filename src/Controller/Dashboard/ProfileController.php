@@ -11,6 +11,7 @@ use App\Form\ProfileFormType;
 use App\Service\ArticleService;
 use App\Service\ModuleService;
 use App\Service\SubscriptionService;
+use App\Service\UserService;
 use App\Service\ValidateCsrfTokenTrait;
 use App\Service\Verification\Exception\NewEmailAlreadyVerifiedException;
 use App\Service\Verification\VerifyNewEmailService;
@@ -280,5 +281,30 @@ class ProfileController extends AbstractController
         $flashBag->add('success', 'Модуль успешно удален.');
 
         return $this->redirectToRoute('app_dashboard_modules');
+    }
+
+    /**
+     * @Route("/dashboard/profile/regenerate-api-token", methods="POST",
+     *                                                   name="app_dashboard_profile_regenerate_api_token")
+     * @param Request     $request
+     * @param UserService $userService
+     *
+     * @return Response
+     */
+    public function regenerateApiToken(Request $request, UserService $userService): Response
+    {
+        if (!$this->validateToken('api_token', $request->query->get('_csrf', ''))) {
+            return $this->json([
+                'error' => 'Неверный csrf токен',
+            ], 400);
+        }
+
+        /** @var User $user */
+        $user = $this->getUser();
+        $userService->regenerateApiToken($user);
+
+        return $this->json([
+            'token' => $user->getApiToken(),
+        ]);
     }
 }

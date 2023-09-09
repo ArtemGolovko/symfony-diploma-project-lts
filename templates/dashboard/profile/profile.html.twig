@@ -11,9 +11,17 @@
 
             <div class="card my-4">
                 <div class="card-body">
+                    <div class="alert alert-danger d-none" role="alert" data-target="api-token-error"></div>
 
-                    <p>Ваш API токен: {{ app.user.apiToken }}</p>
-                    <button class="btn btn-outline-primary">Создать новый</button>
+                    <p data-target="api-token-container">Ваш API токен: {{ app.user.apiToken }}</p>
+                    <button
+                        class="btn btn-outline-primary"
+                        data-target="api-token-button"
+                        data-url="{{ path('app_dashboard_profile_regenerate_api_token', {
+                            '_csrf': csrf_token('api_token')
+                        }) }}"
+                        data-method="POST"
+                    >Создать новый</button>
                 </div>
             </div>
 
@@ -52,4 +60,9 @@
             {{ form_end(form) }}
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/profile.js') }}"></script>
 {% endblock %}

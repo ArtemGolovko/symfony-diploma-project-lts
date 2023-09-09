@@ -66,4 +66,15 @@ class UserService
 
         return $user;
     }
+
+    /**
+     * @param User $user
+     *
+     * @return void
+     */
+    public function regenerateApiToken(User $user): void
+    {
+        $user->setApiToken($this->apiTokenGenerator->generate());
+        $this->em->flush();
+    }
 }
