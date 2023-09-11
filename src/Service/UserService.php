@@ -43,6 +43,7 @@ class UserService
      * @param string $name
      * @param string $password
      * @param bool   $isVerified
+     * @param bool   $flush
      *
      * @return User
      */
@@ -50,7 +51,8 @@ class UserService
         string $email,
         string $name,
         string $password,
-        bool $isVerified = false
+        bool $isVerified = false,
+        bool $flush = true
     ): User {
         $user = new User();
         $user
@@ -62,7 +64,9 @@ class UserService
         ;
 
         $this->em->persist($user);
-        $this->em->flush();
+        if ($flush) {
+            $this->em->flush();
+        }
 
         return $user;
     }
