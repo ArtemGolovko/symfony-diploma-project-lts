@@ -33,7 +33,13 @@ class UserFixtures extends Fixture
         $faker = Factory::create();
 
         for ($i = 0; $i < 10; $i++) {
-            $user = $this->userService->create($faker->email, $faker->firstName, 'query', true);
+            $user = $this->userService->create(
+                $faker->email,
+                $faker->firstName,
+                'query',
+                true,
+                false
+            );
 
             if ($faker->boolean(30)) {
                 $user
