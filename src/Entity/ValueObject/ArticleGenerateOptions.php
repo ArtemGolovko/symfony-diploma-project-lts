@@ -52,28 +52,9 @@ class ArticleGenerateOptions
      */
     private array $images;
 
-    /**
-     * @param string         $theme
-     * @param string[]       $keywords
-     * @param string|null    $title
-     * @param Range          $size
-     * @param PromotedWord[] $promotedWords
-     * @param string[]       $images
-     */
-    public function __construct(
-        string $theme,
-        array $keywords,
-        Range $size,
-        array $promotedWords,
-        ?string $title = null,
-        array $images = []
-    ) {
-        $this->theme = $theme;
-        $this->keywords = $keywords;
-        $this->title = $title;
-        $this->size = $size;
-        $this->promotedWords = $promotedWords;
-        $this->images = $images;
+    public function __construct()
+    {
+        $this->images = [];
     }
 
     /**
@@ -142,6 +123,18 @@ class ArticleGenerateOptions
     public function getSize(): Range
     {
         return $this->size;
+    }
+
+    /**
+     * @param Range $size
+     *
+     * @return ArticleGenerateOptions
+     */
+    public function setSize(Range $size): ArticleGenerateOptions
+    {
+        $this->size = $size;
+
+        return $this;
     }
 
     /**

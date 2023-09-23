@@ -17,11 +17,15 @@ class PromotedWord implements \Serializable, \Stringable
     /**
      * @param string $word
      * @param int    $repetitions
+     *
+     * @return PromotedWord
      */
-    public function __construct(string $word, int $repetitions)
+    public static function create(string $word, int $repetitions): PromotedWord
     {
-        $this->word = $word;
-        $this->repetitions = $repetitions;
+        return (new PromotedWord())
+            ->setWord($word)
+            ->setRepetitions($repetitions)
+        ;
     }
 
     /**

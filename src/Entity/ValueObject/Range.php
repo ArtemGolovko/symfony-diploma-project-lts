@@ -3,7 +3,6 @@
 namespace App\Entity\ValueObject;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Embeddable
@@ -12,27 +11,46 @@ class Range
 {
     /**
      * @ORM\Column(type="smallint")
-     * @Assert\LessThanOrEqual(propertyPath="end")
      * @var int
      */
     private int $begin;
 
     /**
-     * @ORM\Column(type="smallint")
-     * @var int
+     * @ORM\Column(type="smallint", nullable=true)
+     * @var int|null
      */
-    private int $end;
+    private ?int $end;
 
     /**
      * @param int      $begin
      * @param int|null $end
      *
-     * @throws \InvalidArgumentException
+     * @return void
      */
-    public function __construct(int $begin, ?int $end = null)
+    public static function create(int $begin, ?int $end = null): Range
     {
-        $this->begin = $begin;
-        $this->end = $end ?? $begin;
+        return (new Range())
+            ->setBegin($begin)
+            ->setEnd($end)
+        ;
+    }
+
+    /**
+     * @param $data
+     *
+     * @return Range
+     */
+    public static function from($data): Range
+    {
+        if (is_int($data)) {
+            return Range::create($data);
+        }
+
+        if (is_array($data) && (count($data) >= 2) && is_int($data[0]) && is_int($data[1])) {
+            return Range::create($data[0], $data[1]);
+        }
+
+        throw new \InvalidArgumentException("Invalid argument");
     }
 
     /**
@@ -44,24 +62,35 @@ class Range
     }
 
     /**
-     * @return int
+     * @param int $begin
+     *
+     * @return Range
      */
-    public function getEnd(): int
+    public function setBegin(int $begin): Range
+    {
+        $this->begin = $begin;
+
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getEnd(): ?int
     {
         return $this->end;
     }
 
     /**
-     * @param int      $begin
      * @param int|null $end
      *
-     * @return void
-     * @throws \InvalidArgumentException
+     * @return Range
      */
-    public function set(int $begin, ?int $end = null): void
+    public function setEnd(?int $end = null): Range
     {
-        $this->begin = $begin;
-        $this->end = $end ?? $begin;
+        $this->end = $end;
+
+        return $this;
     }
 
     /**
@@ -71,6 +100,10 @@ class Range
      */
     public function generate(): int
     {
+        if (!$this->end) {
+            return $this->begin;
+        }
+
         return mt_rand($this->begin, $this->end);
     }
 }
