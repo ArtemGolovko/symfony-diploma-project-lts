@@ -6,9 +6,22 @@ use App\Entity\Dto\PromotedWord;
 use App\Entity\ValueObject\ArticleGenerateOptions;
 use App\Entity\ValueObject\Range;
 use JsonSchema\Validator;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 class ArticleOptionsDeserializer
 {
+    private string $schemasDir;
+
+    /**
+     * @param string          $resourcesDir
+     * @param string          $schemasDir
+     * @param KernelInterface $kernel
+     */
+    public function __construct(string $resourcesDir, string $schemasDir, KernelInterface $kernel)
+    {
+        $this->schemasDir = $kernel->getProjectDir() . '/' . $resourcesDir . $schemasDir;
+    }
+
     /**
      * @param string $json
      *
@@ -17,80 +30,7 @@ class ArticleOptionsDeserializer
     public function deserializeJson(string $json)
     {
         $data = json_decode($json);
-        $schema = <<<'JSON'
-{
-  "type": "object",
-  "properties": {
-    "theme": { "type": "string" },
-    "keywords": {
-      "properties": {
-        "0": { "type": "string" },
-        "1": { "type": "string" },
-        "2": { "type": "string" },
-        "3": { "type": "string" },
-        "4": { "type": "string" },
-        "5": { "type": "string" },
-        "6": { "type": "string" }
-      },
-      "additionalProperties": false,
-      "required": ["0"]
-    },
-    "title": {
-      "type": "string",
-      "maxLength": 255 
-    },
-    "words": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "word": { "type": "string" },
-          "count": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true
-          }
-        },
-        "required": ["word", "count"]
-      },
-      "minItems": 1
-    },
-    "images": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "format": "uri"
-      }
-    }
-  },
-  "anyOf": [
-    {
-      "properties": {
-        "size": {
-          "type": "integer",
-          "minimum": 0,
-          "exclusiveMinimum": true
-        }
-      }
-    },
-    {
-      "properties": {
-        "size": {
-          "type": "array",
-          "items": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true
-          },
-          "maxItems": 2,
-          "minItems": 2 
-        }
-      }
-    }
-  ],
-  "required": ["theme", "keywords", "size", "words"]
-}
-JSON;
+        $schema = file_get_contents($this->schemasDir . 'api_request_schema.json');
         $validator = new Validator();
         $validator->validate($data, json_decode($schema));
 
