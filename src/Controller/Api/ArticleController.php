@@ -24,6 +24,8 @@ class ArticleController extends AbstractController
      *
      * @param Request                    $request
      * @param ArticleOptionsDeserializer $deserializer
+     * @param ArticleContentGenerator    $contentGenerator
+     * @param ArticleService             $articleService
      *
      * @return Response
      */

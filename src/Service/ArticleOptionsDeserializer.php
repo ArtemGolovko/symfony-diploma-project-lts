@@ -41,7 +41,7 @@ class ArticleOptionsDeserializer
 
         return (new ArticleGenerateOptions())
             ->setTheme($data->theme)
-            ->setKeywords(array_values((array)$data->keywords))
+            ->setKeywords(array_values((array)$data->keyword))
             ->setTitle($data->title ?? null)
             ->setSize(Range::from($data->size))
             ->setPromotedWords(

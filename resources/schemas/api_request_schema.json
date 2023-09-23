@@ -2,7 +2,7 @@
   "type": "object",
   "properties": {
     "theme": { "type": "string" },
-    "keywords": {
+    "keyword": {
       "properties": {
         "0": { "type": "string" },
         "1": { "type": "string" },
@@ -68,5 +68,5 @@
       }
     }
   ],
-  "required": ["theme", "keywords", "size", "words"]
+  "required": ["theme", "keyword", "size", "words"]
 }
