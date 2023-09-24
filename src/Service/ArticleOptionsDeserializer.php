@@ -40,8 +40,6 @@ class ArticleOptionsDeserializer
             throw new DeserializationException('Unable to deserialize.', $validator->getErrors());
         }
 
-        dump($data);
-
         return (new ArticleGenerateOptions())
             ->setTheme($data->theme)
             ->setKeywords(array_values((array)$data->keyword))
