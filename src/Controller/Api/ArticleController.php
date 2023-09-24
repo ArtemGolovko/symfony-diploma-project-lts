@@ -4,14 +4,19 @@ namespace App\Controller\Api;
 
 use App\Entity\Article;
 use App\Entity\ValueObject\Subscription;
+use App\Exception\DeserializationException;
 use App\Service\ArticleContentGenerator\ArticleContentGenerator;
 use App\Service\ArticleOptionsDeserializer;
 use App\Service\ArticleService;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Twig\Error\LoaderError;
+use Twig\Error\SyntaxError;
 
 /**
  * @Route("/api/v1", name="api_v1_")
@@ -28,6 +33,11 @@ class ArticleController extends AbstractController
      * @param ArticleService             $articleService
      *
      * @return Response
+     * @throws DeserializationException
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     * @throws LoaderError
+     * @throws SyntaxError
      */
     public function index(
         Request $request,
@@ -49,7 +59,9 @@ class ArticleController extends AbstractController
             ->setGenerateOptions($options)
         ;
 
-        $articleService->save($article);
+        if (!$articleService->save($article)) {
+            throw new \Exception('Превышен лимит создания статей, чтобы снять лимит Улучшите подписку');
+        }
 
         $generated['description'] = $articleService->generateDescription($article);
 
