@@ -55,6 +55,20 @@ class ArticleService
     }
 
     /**
+     * @param Article $article
+     *
+     * @return string
+     */
+    public function generateDescription(Article $article): string
+    {
+        return truncate(
+            ltrim(preg_replace("/\s+/", " ", strip_tags($article->getContent()))),
+            58,
+            "..."
+        );
+    }
+
+    /**
      * @param User $user
      *
      * @return int[]

@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Dto\PromotedWord;
 use App\Entity\ValueObject\ArticleGenerateOptions;
 use App\Entity\ValueObject\Range;
+use App\Exception\DeserializationException;
 use JsonSchema\Validator;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -26,6 +27,7 @@ class ArticleOptionsDeserializer
      * @param string $json
      *
      * @return ArticleGenerateOptions|array
+     * @throws DeserializationException
      */
     public function deserializeJson(string $json)
     {
@@ -35,8 +37,9 @@ class ArticleOptionsDeserializer
         $validator->validate($data, json_decode($schema));
 
         if (!$validator->isValid()) {
-            return $validator->getErrors();
+            throw new DeserializationException('Unable to deserialize.', $validator->getErrors());
         }
+
         dump($data);
 
         return (new ArticleGenerateOptions())

@@ -35,40 +35,26 @@ class ArticleController extends AbstractController
         ArticleContentGenerator $contentGenerator,
         ArticleService $articleService
     ): Response {
-        try {
-            $options = $deserializer->deserializeJson($request->getContent());
+        $options = $deserializer->deserializeJson($request->getContent());
 
-            if (is_array($options)) {
-                return $this->json([
-                    'errors' => $options,
-                ], 400);
-            }
+        $generated = $contentGenerator->generate(
+            $options,
+            $this->getUser()->getSubscription()->getLevel() !== Subscription::FREE
+        );
 
-            $generated = $contentGenerator->generate(
-                $options,
-                $this->getUser()->getSubscription()->getLevel() !== Subscription::FREE
-            );
+        $article = (new Article())
+            ->setTitle($generated['title'])
+            ->setContent($generated['content'])
+            ->setAuthor($this->getUser())
+            ->setGenerateOptions($options)
+        ;
 
-            $generated['description'] = truncate(
-                ltrim(preg_replace("/\s+/", " ", strip_tags($generated['content']))),
-                58,
-                "..."
-            );
+        $articleService->save($article);
 
-            $article = (new Article())
-                ->setTitle($generated['title'])
-                ->setContent($generated['content'])
-                ->setAuthor($this->getUser())
-                ->setGenerateOptions($options)
-            ;
+        $generated['description'] = $articleService->generateDescription($article);
 
-            $articleService->save($article);
-
-            return $this->json($generated);
-        } catch (\Exception $e) {
-            return $this->json([
-                'errors' => [$e],
-            ], 400);
-        }
+        return $this->json($generated, 200, [
+            'Accept: application/json',
+        ]);
     }
 }
