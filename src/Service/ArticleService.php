@@ -44,6 +44,8 @@ class ArticleService
         $author = $article->getAuthor();
         $count = $this->articleRepository->findHoursCountByAuthor($author);
 
+        dump($count);
+
         if ($author->getSubscription()->getLevel() !== Subscription::PRO && $count >= 2) {
             return false;
         }
@@ -52,6 +54,20 @@ class ArticleService
         $this->em->flush();
 
         return true;
+    }
+
+    /**
+     * @param Article $article
+     *
+     * @return string
+     */
+    public function generateDescription(Article $article): string
+    {
+        return truncate(
+            ltrim(preg_replace("/\s+/", " ", strip_tags($article->getContent()))),
+            58,
+            "..."
+        );
     }
 
     /**

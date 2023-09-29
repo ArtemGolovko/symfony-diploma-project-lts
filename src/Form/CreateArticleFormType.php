@@ -118,14 +118,13 @@ class CreateArticleFormType extends AbstractType implements DataMapperInterface
 
         /** @var FormInterface[] $forms */
         $forms = iterator_to_array($forms);
-        $sizeBegin = $viewData->getSize()->getBegin();
-        $sizeEnd = $viewData->getSize()->getEnd();
+        $size = $viewData->getSize();
 
         $forms['theme']->setData($viewData->getTheme());
         $forms['keywords']->setData(array_pad($viewData->getKeywords(), 7, ''));
         $forms['title']->setData($viewData->getTitle());
-        $forms['size_begin']->setData($sizeBegin);
-        $forms['size_end']->setData($sizeEnd === $sizeBegin ? null : $sizeEnd);
+        $forms['size_begin']->setData($size->getBegin());
+        $forms['size_end']->setData($size->getEnd());
         $forms['promoted_words']->setData($viewData->getPromotedWords());
     }
 
@@ -142,15 +141,17 @@ class CreateArticleFormType extends AbstractType implements DataMapperInterface
 
         $title = $forms['title']->getData();
 
-        $viewData = new ArticleGenerateOptions(
-            $forms['theme']->getData(),
-            array_filter($forms['keywords']->getData(), function (?string $keyword) {
-                return !empty($keyword);
-            }),
-            new Range($forms['size_begin']->getData(), $forms['size_end']->getData()),
-            $forms['promoted_words']->getData(),
-            $title === '' ? null : $title
-        );
+        $viewData = (new ArticleGenerateOptions())
+            ->setTheme($forms['theme']->getData())
+            ->setKeywords(
+                array_filter($forms['keywords']->getData(), function (?string $keyword) {
+                    return !empty($keyword);
+                })
+            )
+            ->setTitle($title === '' ? null : $title)
+            ->setSize(Range::create($forms['size_begin']->getData(), $forms['size_end']->getData()))
+            ->setPromotedWords($forms['promoted_words']->getData())
+        ;
     }
 
     /**

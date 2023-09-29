@@ -6,9 +6,12 @@
 parameters:
     app.resources_dir: 'resources/'
     article_content_generator.modules_dir: 'modules/'
+    app.schemas_dir: 'schemas/'
     app.images_uploads: 'uploads/images'
     app.images_uploads_dir: '%kernel.project_dir%/public/%app.images_uploads%'
     app.images_uploads_url: '/%app.images_uploads%'
+    router.request_context.scheme: 'https'
+    asset.request_context.secure: true
 
 services:
     # default configuration for services in *this* file
@@ -60,3 +63,12 @@ services:
     App\Service\ImageAssetService:
         arguments:
             $imagesUrl: '%app.images_uploads_url%'
+
+    App\Service\ArticleOptionsDeserializer:
+        arguments:
+            - '%app.resources_dir%'
+            - '%app.schemas_dir%'
+
+    App\EventListener\ExceptionListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }
