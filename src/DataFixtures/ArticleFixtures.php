@@ -37,14 +37,14 @@ class ArticleFixtures extends BaseFixtures implements DependentFixtureInterface
      */
     private function getGenerateOptions(): ArticleGenerateOptions
     {
-        return new ArticleGenerateOptions(
-            $this->faker->word,
-            $this->faker->words(6),
-            $this->getRange(),
-            $this->getPromotedWords(),
-            $this->faker->boolean ? $this->faker->sentence : null,
-            $this->getImages()
-        );
+        return (new ArticleGenerateOptions())
+            ->setTheme($this->faker->word)
+            ->setTitle($this->faker->boolean ? $this->faker->sentence : null)
+            ->setKeywords($this->faker->words(6))
+            ->setSize($this->getRange())
+            ->setPromotedWords($this->getPromotedWords())
+            ->setImages($this->getImages())
+        ;
     }
 
     /**
@@ -55,7 +55,7 @@ class ArticleFixtures extends BaseFixtures implements DependentFixtureInterface
         $begin = $this->faker->numberBetween(1, 3);
         $end = $this->faker->numberBetween($begin, 6);
 
-        return new Range($begin, $end);
+        return Range::create($begin, $end);
     }
 
     /**
@@ -67,7 +67,7 @@ class ArticleFixtures extends BaseFixtures implements DependentFixtureInterface
         $quantity = $this->faker->numberBetween(1, 5);
 
         for ($i = 0; $i < $quantity; $i++) {
-            $promotedWords[] = new PromotedWord($this->faker->word, $this->faker->numberBetween(1, 10));
+            $promotedWords[] = PromotedWord::create($this->faker->word, $this->faker->numberBetween(1, 10));
         }
 
         return $promotedWords;

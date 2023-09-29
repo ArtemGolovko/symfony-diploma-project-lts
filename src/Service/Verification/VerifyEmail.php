@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\Security;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 
-class VerifyEmailService
+class VerifyEmail
 {
     /**
      * @var VerifyEmailHelperInterface

@@ -7,7 +7,7 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class ImageUploadService
+class ImageUploader
 {
     /**
      * @var Slugger

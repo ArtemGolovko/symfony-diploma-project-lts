@@ -8,13 +8,13 @@ use App\Entity\ValueObject\Subscription;
 use App\Form\CreateModuleFormType;
 use App\Form\Model\ProfileFormModel;
 use App\Form\ProfileFormType;
+use App\Helper\ValidateCsrfTokenTrait;
 use App\Service\ArticleService;
 use App\Service\ModuleService;
 use App\Service\SubscriptionService;
 use App\Service\UserService;
-use App\Service\ValidateCsrfTokenTrait;
 use App\Service\Verification\Exception\NewEmailAlreadyVerifiedException;
-use App\Service\Verification\VerifyNewEmailService;
+use App\Service\Verification\VerifyNewEmail;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -112,14 +112,14 @@ class ProfileController extends AbstractController
 
     /**
      * @Route("/dashboard/verify-new-email", name="app_dashboard_verify_new_email")
-     * @param Request               $request
-     * @param VerifyNewEmailService $verifyNewEmail
+     * @param Request        $request
+     * @param VerifyNewEmail $verifyNewEmail
      *
      * @return Response
      */
     public function verifyNewEmail(
         Request $request,
-        VerifyNewEmailService $verifyNewEmail
+        VerifyNewEmail $verifyNewEmail
     ): Response {
         $flashBag = $request->getSession()->getFlashBag();
 
@@ -148,7 +148,7 @@ class ProfileController extends AbstractController
      * @Route("/dashboard/profile", name="app_dashboard_profile")
      * @param Request                      $request
      * @param UserPasswordEncoderInterface $passwordEncoder
-     * @param VerifyNewEmailService        $verifyNewEmail
+     * @param VerifyNewEmail               $verifyNewEmail
      *
      * @return Response
      * @throws TransportExceptionInterface
@@ -156,7 +156,7 @@ class ProfileController extends AbstractController
     public function profile(
         Request $request,
         UserPasswordEncoderInterface $passwordEncoder,
-        VerifyNewEmailService $verifyNewEmail
+        VerifyNewEmail $verifyNewEmail
     ): Response {
         /** @var User $user */
         $user = $this->getUser();

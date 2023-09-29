@@ -3,9 +3,9 @@
 namespace App\Security;
 
 use App\Entity\User;
+use App\Helper\ValidateCsrfTokenTrait;
 use App\Repository\UserRepository;
-use App\Service\RedirectService;
-use App\Service\ValidateCsrfTokenTrait;
+use App\Service\Redirect;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -39,26 +39,26 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
     private UserPasswordEncoderInterface $passwordEncoder;
 
     /**
-     * @var RedirectService
+     * @var Redirect
      */
-    private RedirectService $redirectService;
+    private Redirect $redirect;
 
     /**
      * @param UserRepository               $userRepository
      * @param UrlGeneratorInterface        $urlGenerator
      * @param UserPasswordEncoderInterface $passwordEncoder
-     * @param RedirectService              $redirectService
+     * @param Redirect                     $redirect
      */
     public function __construct(
         UserRepository $userRepository,
         UrlGeneratorInterface $urlGenerator,
         UserPasswordEncoderInterface $passwordEncoder,
-        RedirectService $redirectService
+        Redirect $redirect
     ) {
         $this->userRepository = $userRepository;
         $this->urlGenerator = $urlGenerator;
         $this->passwordEncoder = $passwordEncoder;
-        $this->redirectService = $redirectService;
+        $this->redirect = $redirect;
     }
 
     /**
@@ -148,6 +148,6 @@ class LoginFormAuthenticator extends AbstractFormLoginAuthenticator
         $session = $request->getSession();
         $session->remove('remember_me');
 
-        return $this->redirectService->redirectToRedirectPath('app_dashboard');
+        return $this->redirect->redirectToRedirectPath('app_dashboard');
     }
 }

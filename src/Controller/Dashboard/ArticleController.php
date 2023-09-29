@@ -11,7 +11,7 @@ use App\Form\CreateArticleFormType;
 use App\Repository\ArticleRepository;
 use App\Service\ArticleContentGenerator\ArticleContentGenerator;
 use App\Service\ArticleService;
-use App\Service\ImageUploadService;
+use App\Service\ImageUploader;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Knp\Component\Pager\PaginatorInterface;
@@ -35,7 +35,7 @@ class ArticleController extends AbstractController
      * @param Request                 $request
      * @param ArticleContentGenerator $articleContentGenerator
      * @param ArticleService          $articleService
-     * @param ImageUploadService      $imageUploadService
+     * @param ImageUploader           $imageUploader
      *
      * @return Response
      * @throws LoaderError
@@ -48,7 +48,7 @@ class ArticleController extends AbstractController
         Request $request,
         ArticleContentGenerator $articleContentGenerator,
         ArticleService $articleService,
-        ImageUploadService $imageUploadService
+        ImageUploader $imageUploader
     ): Response {
         $formData = null;
         if ($request->query->has('id') && $request->isMethod(Request::METHOD_GET)) {
@@ -72,7 +72,7 @@ class ArticleController extends AbstractController
             $promotedWordsRaw = $request->request->get("create_article_form")["promoted_words"];
             $promotedWords = array_filter(
                 array_map(function (array $promotedWordRaw): PromotedWord {
-                    return new PromotedWord($promotedWordRaw['word'], (int)$promotedWordRaw['repetitions']);
+                    return PromotedWord::create($promotedWordRaw['word'], (int)$promotedWordRaw['repetitions']);
                 }, $promotedWordsRaw),
                 function (PromotedWord $promotedWord): bool {
                     return !$promotedWord->isEmpty();
@@ -80,8 +80,8 @@ class ArticleController extends AbstractController
             );
 
             $data->setImages(
-                array_map(function (UploadedFile $file) use ($imageUploadService) {
-                    return $imageUploadService->upload($file);
+                array_map(function (UploadedFile $file) use ($imageUploader) {
+                    return $imageUploader->upload($file);
                 }, $form->get('images')->getData())
             );
 

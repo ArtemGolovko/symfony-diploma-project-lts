@@ -7,10 +7,10 @@ use App\Event\RegistrationSuccessEvent;
 use App\Form\Model\RegistrationFormModel;
 use App\Form\RegistrationFormType;
 use App\Security\LoginFormAuthenticator;
-use App\Service\RedirectService;
+use App\Service\Redirect;
 use App\Service\UserService;
 use App\Service\Verification\Exception\UserAlreadyVerifiedException;
-use App\Service\Verification\VerifyEmailService;
+use App\Service\Verification\VerifyEmail;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -86,16 +86,16 @@ class SecurityController extends AbstractController
     /**
      * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
      * @Route("/verify-email",  name="app_verify_email")
-     * @param VerifyEmailService $verifyEmail
-     * @param Request            $request
-     * @param RedirectService    $redirectService
+     * @param VerifyEmail $verifyEmail
+     * @param Request     $request
+     * @param Redirect    $redirectService
      *
      * @return Response
      */
     public function verifyEmail(
-        VerifyEmailService $verifyEmail,
+        VerifyEmail $verifyEmail,
         Request $request,
-        RedirectService $redirectService
+        Redirect $redirectService
     ): Response {
         try {
             $verifyEmail->verifyEmail($request);

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Helper;
 
 use Doctrine\Common\Annotations\Annotation\Required;
 use Symfony\Component\Security\Csrf\CsrfToken;

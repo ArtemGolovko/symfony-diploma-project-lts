@@ -7,6 +7,8 @@
 {% form_theme form.promoted_words 'form/register_layout.html.twig' %}
 
 {% set FREE = constant('App\\Entity\\ValueObject\\Subscription::FREE') %}
+{% set PLUS = constant('App\\Entity\\ValueObject\\Subscription::PLUS') %}
+{% set disabled = not app.user.subscription.subordinates(PLUS) %}
 
 {% block content %}
     <h1 class="mt-4">Создание статьи</h1>
@@ -37,7 +39,7 @@
                                 label: keyword[1],
                                 attr: { placeholder: keyword[1] },
                                 required: index == 0,
-                                disabled: index != 0 and app.user.subscription.level == FREE
+                                disabled: index != 0 and disabled
                             }) }}
                         {% endfor %}
                     </div>
@@ -68,7 +70,7 @@
                                         label: 'Продвигаемое слово',
                                         attr: { placeholder: 'Продвигаемое слово' },
                                         required: false,
-                                        disabled: index != 0 and app.user.subscription.level == FREE
+                                        disabled: index != 0 and disabled
                                     }) }}
                                 </div>
                                 <div class="col">
@@ -79,12 +81,12 @@
                                             value: (promoted_word.repetitions.vars.value == 0) ? null : promoted_word.repetitions.vars.value
                                         },
                                         required: false,
-                                        disabled: index != 0 and app.user.subscription.level == FREE
+                                        disabled: index != 0 and disabled
                                     }) }}
                                 </div>
                             </div>
                             {% endfor %}
-                            {% if form.promoted_words|length < 1 or app.user.subscription.level != FREE %}
+                            {% if form.promoted_words|length < 1 or app.user.subscription.subordinates(PLUS) %}
                             <div class="row">
                                 <div class="col">
                                     <div class="form-label-group">
@@ -114,7 +116,7 @@
                 </div>
                 {{ form_row(form.images, {
                     required: false,
-                    disabled: app.user.subscription.level == FREE
+                    disabled: disabled
                 }) }}
                 {{ form_row(form._token) }}
                 <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Создать</button>
@@ -143,7 +145,7 @@
 
 {% block javascripts %}
     {{ parent() }}
-    {% if app.user.subscription.level != FREE  %}
+    {% if app.user.subscription.subordinates(PLUS) %}
         <script src="{{ asset('js/dashboard_create_article.js') }}"></script>
     {% endif %}
 {% endblock %}

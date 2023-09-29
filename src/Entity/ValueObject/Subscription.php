@@ -100,4 +100,18 @@ class Subscription
 
         return array_search($level, self::HIERARCHY) <= array_search($this->getLevel(), self::HIERARCHY);
     }
+
+    /**
+     * @param string $level
+     *
+     * @return bool
+     */
+    public function is(string $level): bool
+    {
+        if (!in_array($level, self::HIERARCHY)) {
+            throw new \InvalidArgumentException('Invalid level.');
+        }
+
+        return $this->getLevel() === $level;
+    }
 }

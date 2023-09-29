@@ -4,7 +4,7 @@ namespace App\Service;
 
 use Symfony\Component\Asset\Packages;
 
-class ImageAssetService
+class ImageAsset
 {
     /**
      * @var string

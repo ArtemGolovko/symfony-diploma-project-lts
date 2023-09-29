@@ -14,7 +14,7 @@ use SymfonyCasts\Bundle\VerifyEmail\Exception\InvalidSignatureException;
 use SymfonyCasts\Bundle\VerifyEmail\Exception\VerifyEmailExceptionInterface;
 use SymfonyCasts\Bundle\VerifyEmail\VerifyEmailHelperInterface;
 
-class VerifyNewEmailService
+class VerifyNewEmail
 {
     /**
      * @var VerifyEmailHelperInterface

@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
-class RedirectService
+class Redirect
 {
     use TargetPathTrait;
 
