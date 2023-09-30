@@ -129,16 +129,15 @@ class ArticleContentGenerator
         $themeNames = $this->themeProvider->getThemeNames();
         $themeName = $themeNames[array_rand($themeNames)];
 
-        $article = $this->generate(
-            new ArticleGenerateOptions(
-                $themeName,
-                [$keyword],
-                new Range(3, 6),
-                [],
-                $title
-            ),
-            false
-        );
+        $options = (new ArticleGenerateOptions())
+            ->setTheme($themeName)
+            ->setKeywords([$keyword])
+            ->setSize(Range::create(3, 6))
+            ->setTitle($title)
+            ->setPromotedWords([])
+        ;
+
+        $article = $this->generate($options, false);
 
         return $article['content'];
     }

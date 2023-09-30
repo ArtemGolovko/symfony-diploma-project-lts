@@ -26,10 +26,10 @@ class ArticleOptionsDeserializer
     /**
      * @param string $json
      *
-     * @return ArticleGenerateOptions|array
+     * @return ArticleGenerateOptions
      * @throws DeserializationException
      */
-    public function deserializeJson(string $json)
+    public function deserializeJson(string $json): ArticleGenerateOptions
     {
         $data = json_decode($json);
         $schema = file_get_contents($this->schemasDir . 'api_request_schema.json');

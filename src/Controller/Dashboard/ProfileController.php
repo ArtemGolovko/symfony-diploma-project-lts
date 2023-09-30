@@ -93,6 +93,7 @@ class ProfileController extends AbstractController
         $flashBug = $request->getSession()->getFlashBag();
 
         if ($this->validateToken('request', $request->query->get('_csrf', ''))) {
+            /** @var User $user */
             $user = $this->getUser();
             $subscriptionService->upgrade($user, $level);
 
@@ -126,11 +127,11 @@ class ProfileController extends AbstractController
         try {
             $verifyNewEmail->verifyNewEmail($request);
         } catch (NewEmailAlreadyVerifiedException $exception) {
-            $flashBag->add('error', 'Ви уже изминили почту');
+            $flashBag->add('error', 'Ви уже изменили почту');
 
             return $this->redirectToRoute('app_dashboard_profile');
         } catch (ExpiredSignatureException $exception) {
-            $this->addFlash('error', 'Срок действия кода подверждения вичерпан.');
+            $this->addFlash('error', 'Срок действия кода подтверждения вычерпан.');
 
             return $this->redirectToRoute('app_dashboard_profile');
         } catch (VerifyEmailExceptionInterface $exception) {

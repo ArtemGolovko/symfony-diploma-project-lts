@@ -39,7 +39,7 @@ class AccessDeniedHandler implements AccessDeniedHandlerInterface
         if (in_array(UserAnonymousVoter::IS_ANONYMOUS, $attributes)) {
             return $this->createResponse(
                 $request,
-                'Страница не доступна для авторизованых пользователей.',
+                'Страница не доступна для авторизованных пользователей.',
                 'app_dashboard'
             );
         }
@@ -48,7 +48,7 @@ class AccessDeniedHandler implements AccessDeniedHandlerInterface
             || in_array(UserVerifiedVoter::IS_AUTHENTICATED_FULLY_AND_VERIFIED, $attributes)) {
             return $this->createResponse(
                 $request,
-                'Страница доступна только для авторизованых пользователей, которые подвердили свой email.',
+                'Страница доступна только для авторизованных пользователей, которые подтвердили свой email.',
                 'app_register'
             );
         }
@@ -56,7 +56,7 @@ class AccessDeniedHandler implements AccessDeniedHandlerInterface
         if (in_array(UserVerifiedVoter::IS_ANONYMOUS_OR_UNVERIFIED, $attributes)) {
             return $this->createResponse(
                 $request,
-                'Страница не доступна для авторизованых пользователей и тех кто подвердили свой email.',
+                'Страница не доступна для авторизованных пользователей и тех кто подтвердили свой email.',
                 'app_dashboard'
             );
         }

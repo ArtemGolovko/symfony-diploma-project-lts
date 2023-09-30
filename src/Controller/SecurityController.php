@@ -104,8 +104,8 @@ class SecurityController extends AbstractController
         } catch (ExpiredSignatureException $exception) {
             $verifyEmail->requestVerification();
 
-            $this->addFlash('error', 'Срок действия кода подверждения вичерпан.');
-            $this->addFlash('success', 'Вам прислан новий код подтверждения.');
+            $this->addFlash('error', 'Срок действия кода подтверждения вычерпан.');
+            $this->addFlash('success', 'Вам прислан новый код подтверждения.');
 
             return $this->redirectToRoute('app_register');
         } catch (VerifyEmailExceptionInterface $exception) {

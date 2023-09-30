@@ -77,7 +77,7 @@ class ArticleService
     {
         return [
             'monthsCount' => $this->articleRepository->findMouthsCountByAuthor($user),
-            'totalCount' => $this->articleRepository->findTotalCountbyAuthor($user),
+            'totalCount' => $this->articleRepository->findTotalCountByAuthor($user),
         ];
     }
 

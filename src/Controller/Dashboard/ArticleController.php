@@ -105,7 +105,7 @@ class ArticleController extends AbstractController
                 $request->getSession()->getFlashBag()->set('error', true);
 
                 return $this->redirectToRoute('app_dashboard_article_create');
-            };
+            }
 
             $session->set('article_content', $article->getContent());
 

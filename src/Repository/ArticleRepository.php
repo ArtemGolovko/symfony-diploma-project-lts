@@ -67,7 +67,7 @@ class ArticleRepository extends ServiceEntityRepository
      *
      * @return int
      */
-    public function findTotalCountbyAuthor(User $author): int
+    public function findTotalCountByAuthor(User $author): int
     {
         return $this
             ->createQueryBuilder('a')

@@ -3,6 +3,7 @@
 namespace App\Controller\Api;
 
 use App\Entity\Article;
+use App\Entity\User;
 use App\Entity\ValueObject\Subscription;
 use App\Exception\DeserializationException;
 use App\Service\ArticleContentGenerator\ArticleContentGenerator;
@@ -45,17 +46,19 @@ class ArticleController extends AbstractController
         ArticleContentGenerator $contentGenerator,
         ArticleService $articleService
     ): Response {
+        /** @var User $user */
+        $user = $this->getUser();
         $options = $deserializer->deserializeJson($request->getContent());
 
         $generated = $contentGenerator->generate(
             $options,
-            $this->getUser()->getSubscription()->getLevel() !== Subscription::FREE
+            $user->getSubscription()->getLevel() !== Subscription::FREE
         );
 
         $article = (new Article())
             ->setTitle($generated['title'])
             ->setContent($generated['content'])
-            ->setAuthor($this->getUser())
+            ->setAuthor($user)
             ->setGenerateOptions($options)
         ;
 

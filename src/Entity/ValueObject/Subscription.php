@@ -58,7 +58,7 @@ class Subscription
     public function setLevel(string $level, ?\DateTimeImmutable $expiresAt = null): self
     {
         if (self::HIERARCHY[0] !== $level && null === $expiresAt) {
-            throw new \InvalidArgumentException("Cannot set level {$level} with unlimited lifetime");
+            throw new \InvalidArgumentException("Cannot set level $level with unlimited lifetime");
         }
 
         $this->level = $level;
