@@ -7,9 +7,9 @@ use Symfony\Component\Form\DataTransformerInterface;
 class RepeatedPasswordTransformer implements DataTransformerInterface
 {
     /**
-     * @param string $value
+     * @param string|null $value
      *
-     * @return string[]
+     * @return string|null[]
      */
     public function transform($value): array
     {
@@ -20,11 +20,11 @@ class RepeatedPasswordTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param string[] $value
+     * @param string|null[] $value
      *
-     * @return string
+     * @return string|null
      */
-    public function reverseTransform($value): string
+    public function reverseTransform($value): ?string
     {
         return $value['password'];
     }

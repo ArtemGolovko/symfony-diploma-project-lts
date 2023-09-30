@@ -168,22 +168,27 @@ class ProfileController extends AbstractController
             /** @var ProfileFormModel $data */
             $data = $form->getData();
             $flashBag = $request->getSession()->getFlashBag();
+            $changed = false;
 
-            if ($data->name) {
+            if ($data->name && $data->name !== $user->getName()) {
                 $user->setName($data->name);
+                $changed = true;
             }
 
             if ($data->plainPassword) {
                 $user->setPassword($passwordEncoder->encodePassword($user, $data->plainPassword));
+                $changed = true;
             }
 
-            if ($data->email) {
+            if ($data->email && $user->getEmail() !== $data->email) {
                 $verifyNewEmail->requestVerification($data->email);
                 $flashBag->add('success', 'Для изменения электронной почты подтвердите новую электронною почту');
             }
 
-            $this->getDoctrine()->getManager()->flush();
-            $flashBag->add('success', 'Профиль успешно изменен');
+            if ($changed) {
+                $this->getDoctrine()->getManager()->flush();
+                $flashBag->add('success', 'Профиль успешно изменен');
+            }
 
             return $this->redirectToRoute('app_dashboard_profile');
         }
