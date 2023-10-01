@@ -54,6 +54,7 @@ class ArticleGenerateOptions
 
     public function __construct()
     {
+        $this->promotedWords = [];
         $this->images = [];
     }
 

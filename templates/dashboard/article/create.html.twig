@@ -2,9 +2,8 @@
 
 {% form_theme form.keywords 'form/register_layout.html.twig' %}
 {% form_theme form.title 'form/register_layout.html.twig' %}
-{% form_theme form.size_begin 'form/register_layout.html.twig' %}
-{% form_theme form.size_end 'form/register_layout.html.twig' %}
-{% form_theme form.promoted_words 'form/register_layout.html.twig' %}
+{% form_theme form.size 'form/register_layout.html.twig' %}
+{% form_theme form.promotedWords 'form/register_layout.html.twig' %}
 
 {% set FREE = constant('App\\Entity\\ValueObject\\Subscription::FREE') %}
 {% set PLUS = constant('App\\Entity\\ValueObject\\Subscription::PLUS') %}
@@ -46,14 +45,14 @@
                 </div>
                 <div class="row">
                     <div class="col">
-                        {{ form_row(form.size_begin, {
+                        {{ form_row(form.size.begin, {
                             label: 'Размер статьи от',
                             attr: { placeholder: 'Размер статьи' },
                             required: true
                         }) }}
                     </div>
                     <div class="col">
-                        {{ form_row(form.size_end, {
+                        {{ form_row(form.size.end, {
                             label: 'До',
                             attr: { placeholder: 'До' },
                             required: false
@@ -63,7 +62,7 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <p class="card-title">Продвигаемые слова</p>
-                        {%  for index, promoted_word in form.promoted_words %}
+                        {%  for index, promoted_word in form.promotedWords %}
                             <div class="row">
                                 <div class="col">
                                     {{ form_row(promoted_word.word, {
@@ -78,7 +77,7 @@
                                         label: 'кол-во',
                                         attr: {
                                             placeholder: 'кол-во',
-                                            value: (promoted_word.repetitions.vars.value == 0) ? null : promoted_word.repetitions.vars.value
+
                                         },
                                         required: false,
                                         disabled: index != 0 and disabled
@@ -86,28 +85,29 @@
                                 </div>
                             </div>
                             {% endfor %}
-                            {% if form.promoted_words|length < 1 or app.user.subscription.subordinates(PLUS) %}
+                            {% if form.promotedWords|length < 1 or app.user.subscription.subordinates(PLUS) %}
+                                {% set index = form.promotedWords|length  %}
                             <div class="row">
                                 <div class="col">
                                     <div class="form-label-group">
                                         <input  type="text"
-                                                id="create_article_form_promoted_words_0_word"
-                                                name="create_article_form[promoted_words][0][word]"
+                                                id="create_article_form_promotedWords_{{ index }}_word"
+                                                name="create_article_form[promotedWords][{{ index }}][word]"
                                                 placeholder="Продвигаемое слово"
                                                 class="form-control"
                                         >
-                                        <label for="create_article_form_promoted_words_0_word">Продвигаемое слово</label>
+                                        <label for="create_article_form_promotedWords_{{ index }}_word">Продвигаемое слово</label>
                                     </div>
                                 </div>
                                 <div class="col">
                                     <div class="form-label-group">
                                         <input  type="text"
-                                                id="create_article_form_promoted_words_0_repetitions"
-                                                name="create_article_form[promoted_words][0][repetitions]"
+                                                id="create_article_form_promotedWords_{{ index }}_repetitions"
+                                                name="create_article_form[promotedWords][{{ index }}][repetitions]"
                                                 placeholder="кол-во"
                                                 class="form-control"
                                         >
-                                        <label for="create_article_form_promoted_words_0_repetitions">кол-во</label>
+                                        <label for="create_article_form_promotedWords_{{ index }}_repetitions">кол-во</label>
                                     </div>
                                 </div>
                             </div>
@@ -118,6 +118,7 @@
                     required: false,
                     disabled: disabled
                 }) }}
+
                 {{ form_row(form._token) }}
                 <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Создать</button>
             {{ form_end(form, { render_rest: false }) }}

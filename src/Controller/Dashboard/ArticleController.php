@@ -3,7 +3,6 @@
 namespace App\Controller\Dashboard;
 
 use App\Entity\Article;
-use App\Entity\Dto\PromotedWord;
 use App\Entity\User;
 use App\Entity\ValueObject\ArticleGenerateOptions;
 use App\Entity\ValueObject\Subscription;
@@ -50,13 +49,7 @@ class ArticleController extends AbstractController
         ArticleService $articleService,
         ImageUploader $imageUploader
     ): Response {
-        $formData = null;
-        if ($request->query->has('id') && $request->isMethod(Request::METHOD_GET)) {
-            $article = $this->getDoctrine()->getManager()->find(Article::class, $request->query->getInt('id'));
-            $formData = $article->getGenerateOptions();
-        }
-
-        $form = $this->createForm(CreateArticleFormType::class, $formData);
+        $form = $this->createForm(CreateArticleFormType::class);
         $form->handleRequest($request);
 
         if ($request->query->has('id') && !$form->isSubmitted()) {
@@ -69,15 +62,6 @@ class ArticleController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var ArticleGenerateOptions $data */
             $data = $form->getData();
-            $promotedWordsRaw = $request->request->get("create_article_form")["promoted_words"];
-            $promotedWords = array_filter(
-                array_map(function (array $promotedWordRaw): PromotedWord {
-                    return PromotedWord::create($promotedWordRaw['word'], (int)$promotedWordRaw['repetitions']);
-                }, $promotedWordsRaw),
-                function (PromotedWord $promotedWord): bool {
-                    return !$promotedWord->isEmpty();
-                }
-            );
 
             $data->setImages(
                 array_map(function (UploadedFile $file) use ($imageUploader) {
@@ -85,7 +69,6 @@ class ArticleController extends AbstractController
                 }, $form->get('images')->getData())
             );
 
-            $data->setPromotedWords($promotedWords);
             /** @var User $user */
             $user = $this->getUser();
 

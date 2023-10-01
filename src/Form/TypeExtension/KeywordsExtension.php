@@ -2,14 +2,13 @@
 
 namespace App\Form\TypeExtension;
 
-use App\Entity\Dto\PromotedWord;
+use App\Form\DataTransformer\KeywordsTransformer;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class PromotedWordExtension extends AbstractType
+class KeywordsExtension extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -20,12 +19,14 @@ class PromotedWordExtension extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('word', TextType::class, [
-                'empty_data' => '',
-            ])
-            ->add('repetitions', NumberType::class, [
-                'empty_data' => '0',
-            ])
+            ->addViewTransformer(new KeywordsTransformer())
+            ->add('0', TextType::class)
+            ->add('1', TextType::class)
+            ->add('2', TextType::class)
+            ->add('3', TextType::class)
+            ->add('4', TextType::class)
+            ->add('5', TextType::class)
+            ->add('6', TextType::class)
         ;
     }
 
@@ -36,8 +37,6 @@ class PromotedWordExtension extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'data_class' => PromotedWord::class,
-        ]);
+        $resolver->setDefaults([]);
     }
 }

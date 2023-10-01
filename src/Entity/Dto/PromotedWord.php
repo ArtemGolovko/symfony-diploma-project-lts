@@ -29,14 +29,6 @@ class PromotedWord implements \Serializable, \Stringable
     }
 
     /**
-     * @return PromotedWord
-     */
-    public static function empty(): PromotedWord
-    {
-        return new PromotedWord('', 0);
-    }
-
-    /**
      * @return string
      */
     public function getWord(): string
@@ -102,13 +94,5 @@ class PromotedWord implements \Serializable, \Stringable
     public function __toString(): string
     {
         return $this->word;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isEmpty(): bool
-    {
-        return $this->word === '' && $this->repetitions === 0;
     }
 }
