@@ -5,6 +5,24 @@
 {% form_theme form.size 'form/register_layout.html.twig' %}
 {% form_theme form.promotedWords 'form/register_layout.html.twig' %}
 
+{% set prototype = form.promotedWords.vars.prototype %}
+
+{% form_theme prototype 'form/register_layout.html.twig' %}
+{% set prototype_word = form_row(prototype.word, {
+    label: 'Продвигаемое слово',
+    attr: {
+        placeholder: 'Продвигаемое слово',
+        'data-index': '__name__'
+    },
+    required: false
+}) %}
+{% set prototype_repetitions = form_row(prototype.repetitions, {
+    label: 'кол-во',
+    attr: { placeholder: 'кол-во'  },
+    required: false
+}) %}
+
+
 {% set FREE = constant('App\\Entity\\ValueObject\\Subscription::FREE') %}
 {% set PLUS = constant('App\\Entity\\ValueObject\\Subscription::PLUS') %}
 {% set disabled = not app.user.subscription.subordinates(PLUS) %}
@@ -60,24 +78,32 @@
                     </div>
                 </div>
                 <div class="card mb-4">
-                    <div class="card-body">
+                    <div
+                        class="card-body"
+                        data-target="prototype"
+                        data-prototype-word="{{ prototype_word|e('html_attr') }}"
+                        data-prototype-repetitions="{{ prototype_repetitions|e('html_attr') }}"
+                        data-prototype-index="{{ form.promotedWords|length }}"
+                    >
                         <p class="card-title">Продвигаемые слова</p>
                         {%  for index, promoted_word in form.promotedWords %}
                             <div class="row">
                                 <div class="col">
                                     {{ form_row(promoted_word.word, {
                                         label: 'Продвигаемое слово',
-                                        attr: { placeholder: 'Продвигаемое слово' },
+                                        attr: {
+                                            placeholder: 'Продвигаемое слово',
+                                            'data-index': index
+                                        },
                                         required: false,
                                         disabled: index != 0 and disabled
-                                    }) }}
+                                     }) }}
                                 </div>
                                 <div class="col">
                                     {{ form_row(promoted_word.repetitions, {
                                         label: 'кол-во',
                                         attr: {
-                                            placeholder: 'кол-во',
-
+                                            placeholder: 'кол-во'
                                         },
                                         required: false,
                                         disabled: index != 0 and disabled
@@ -86,29 +112,13 @@
                             </div>
                             {% endfor %}
                             {% if form.promotedWords|length < 1 or app.user.subscription.subordinates(PLUS) %}
-                                {% set index = form.promotedWords|length  %}
+                            {% set index = form.promotedWords|length  %}
                             <div class="row">
                                 <div class="col">
-                                    <div class="form-label-group">
-                                        <input  type="text"
-                                                id="create_article_form_promotedWords_{{ index }}_word"
-                                                name="create_article_form[promotedWords][{{ index }}][word]"
-                                                placeholder="Продвигаемое слово"
-                                                class="form-control"
-                                        >
-                                        <label for="create_article_form_promotedWords_{{ index }}_word">Продвигаемое слово</label>
-                                    </div>
+                                    {{ prototype_word|replace({ '__name__': index })|raw }}
                                 </div>
                                 <div class="col">
-                                    <div class="form-label-group">
-                                        <input  type="text"
-                                                id="create_article_form_promotedWords_{{ index }}_repetitions"
-                                                name="create_article_form[promotedWords][{{ index }}][repetitions]"
-                                                placeholder="кол-во"
-                                                class="form-control"
-                                        >
-                                        <label for="create_article_form_promotedWords_{{ index }}_repetitions">кол-во</label>
-                                    </div>
+                                    {{ prototype_repetitions|replace({ '__name__': index })|raw }}
                                 </div>
                             </div>
                             {% endif %}

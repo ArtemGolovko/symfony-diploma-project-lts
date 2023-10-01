@@ -61,6 +61,7 @@ class CreateArticleFormType extends AbstractType
                 'delete_empty' => function (PromotedWord $promotedWord): bool {
                     return $promotedWord->getWord() === '' || $promotedWord->getRepetitions() === 0;
                 },
+                'prototype' => true,
             ])
             ->add('images', FileType::class, [
                 'multiple' => true,
