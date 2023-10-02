@@ -3,7 +3,6 @@
 namespace App\Controller\Dashboard;
 
 use App\Entity\Article;
-use App\Entity\Dto\PromotedWord;
 use App\Entity\User;
 use App\Entity\ValueObject\ArticleGenerateOptions;
 use App\Entity\ValueObject\Subscription;
@@ -11,7 +10,7 @@ use App\Form\CreateArticleFormType;
 use App\Repository\ArticleRepository;
 use App\Service\ArticleContentGenerator\ArticleContentGenerator;
 use App\Service\ArticleService;
-use App\Service\ImageUploadService;
+use App\Service\ImageUploader;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Knp\Component\Pager\PaginatorInterface;
@@ -35,7 +34,7 @@ class ArticleController extends AbstractController
      * @param Request                 $request
      * @param ArticleContentGenerator $articleContentGenerator
      * @param ArticleService          $articleService
-     * @param ImageUploadService      $imageUploadService
+     * @param ImageUploader           $imageUploader
      *
      * @return Response
      * @throws LoaderError
@@ -48,15 +47,9 @@ class ArticleController extends AbstractController
         Request $request,
         ArticleContentGenerator $articleContentGenerator,
         ArticleService $articleService,
-        ImageUploadService $imageUploadService
+        ImageUploader $imageUploader
     ): Response {
-        $formData = null;
-        if ($request->query->has('id') && $request->isMethod(Request::METHOD_GET)) {
-            $article = $this->getDoctrine()->getManager()->find(Article::class, $request->query->getInt('id'));
-            $formData = $article->getGenerateOptions();
-        }
-
-        $form = $this->createForm(CreateArticleFormType::class, $formData);
+        $form = $this->createForm(CreateArticleFormType::class);
         $form->handleRequest($request);
 
         if ($request->query->has('id') && !$form->isSubmitted()) {
@@ -69,23 +62,13 @@ class ArticleController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var ArticleGenerateOptions $data */
             $data = $form->getData();
-            $promotedWordsRaw = $request->request->get("create_article_form")["promoted_words"];
-            $promotedWords = array_filter(
-                array_map(function (array $promotedWordRaw): PromotedWord {
-                    return new PromotedWord($promotedWordRaw['word'], (int)$promotedWordRaw['repetitions']);
-                }, $promotedWordsRaw),
-                function (PromotedWord $promotedWord): bool {
-                    return !$promotedWord->isEmpty();
-                }
-            );
 
             $data->setImages(
-                array_map(function (UploadedFile $file) use ($imageUploadService) {
-                    return $imageUploadService->upload($file);
+                array_map(function (UploadedFile $file) use ($imageUploader) {
+                    return $imageUploader->upload($file);
                 }, $form->get('images')->getData())
             );
 
-            $data->setPromotedWords($promotedWords);
             /** @var User $user */
             $user = $this->getUser();
 
@@ -105,7 +88,7 @@ class ArticleController extends AbstractController
                 $request->getSession()->getFlashBag()->set('error', true);
 
                 return $this->redirectToRoute('app_dashboard_article_create');
-            };
+            }
 
             $session->set('article_content', $article->getContent());
 

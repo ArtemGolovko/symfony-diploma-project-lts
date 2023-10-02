@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-class ApiTokenGeneratorService
+class ApiTokenGenerator
 {
     /**
      * @return string

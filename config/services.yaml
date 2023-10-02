@@ -60,7 +60,7 @@ services:
     App\Twig\ArticleGeneratorExtension:
         tags: []
 
-    App\Service\ImageAssetService:
+    App\Service\ImageAsset:
         arguments:
             $imagesUrl: '%app.images_uploads_url%'
 

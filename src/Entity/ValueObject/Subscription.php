@@ -58,7 +58,7 @@ class Subscription
     public function setLevel(string $level, ?\DateTimeImmutable $expiresAt = null): self
     {
         if (self::HIERARCHY[0] !== $level && null === $expiresAt) {
-            throw new \InvalidArgumentException("Cannot set level {$level} with unlimited lifetime");
+            throw new \InvalidArgumentException("Cannot set level $level with unlimited lifetime");
         }
 
         $this->level = $level;
@@ -99,5 +99,19 @@ class Subscription
         }
 
         return array_search($level, self::HIERARCHY) <= array_search($this->getLevel(), self::HIERARCHY);
+    }
+
+    /**
+     * @param string $level
+     *
+     * @return bool
+     */
+    public function is(string $level): bool
+    {
+        if (!in_array($level, self::HIERARCHY)) {
+            throw new \InvalidArgumentException('Invalid level.');
+        }
+
+        return $this->getLevel() === $level;
     }
 }

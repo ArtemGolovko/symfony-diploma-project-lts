@@ -1,7 +1,7 @@
 {% extends 'base_dashboard.html.twig' %}
 
 {% set PRO = constant('App\\Entity\\ValueObject\\Subscription::PRO') %}
-{% set isFormDisabled = app.user.subscription.level != PRO %}
+{% set isFormDisabled = not app.user.subscription.subordinates(PRO) %}
 
 {% block content %}
     <section>

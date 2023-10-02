@@ -8,6 +8,14 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Article>
+ *
+ * @method Article|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Article|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Article[]    findAll()
+ * @method Article[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ */
 class ArticleRepository extends ServiceEntityRepository
 {
     /**
@@ -59,7 +67,7 @@ class ArticleRepository extends ServiceEntityRepository
      *
      * @return int
      */
-    public function findTotalCountbyAuthor(User $author): int
+    public function findTotalCountByAuthor(User $author): int
     {
         return $this
             ->createQueryBuilder('a')

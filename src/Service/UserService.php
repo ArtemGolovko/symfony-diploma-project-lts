@@ -19,19 +19,19 @@ class UserService
     private UserPasswordEncoderInterface $passwordEncoder;
 
     /**
-     * @var ApiTokenGeneratorService
+     * @var ApiTokenGenerator
      */
-    private ApiTokenGeneratorService $apiTokenGenerator;
+    private ApiTokenGenerator $apiTokenGenerator;
 
     /**
      * @param EntityManagerInterface       $em
      * @param UserPasswordEncoderInterface $passwordEncoder
-     * @param ApiTokenGeneratorService     $apiTokenGenerator
+     * @param ApiTokenGenerator            $apiTokenGenerator
      */
     public function __construct(
         EntityManagerInterface $em,
         UserPasswordEncoderInterface $passwordEncoder,
-        ApiTokenGeneratorService $apiTokenGenerator
+        ApiTokenGenerator $apiTokenGenerator
     ) {
         $this->em = $em;
         $this->passwordEncoder = $passwordEncoder;

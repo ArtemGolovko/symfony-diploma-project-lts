@@ -44,8 +44,6 @@ class ArticleService
         $author = $article->getAuthor();
         $count = $this->articleRepository->findHoursCountByAuthor($author);
 
-        dump($count);
-
         if ($author->getSubscription()->getLevel() !== Subscription::PRO && $count >= 2) {
             return false;
         }
@@ -79,7 +77,7 @@ class ArticleService
     {
         return [
             'monthsCount' => $this->articleRepository->findMouthsCountByAuthor($user),
-            'totalCount' => $this->articleRepository->findTotalCountbyAuthor($user),
+            'totalCount' => $this->articleRepository->findTotalCountByAuthor($user),
         ];
     }
 

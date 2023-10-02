@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\ModuleRepository;
+use App\Service\ArticleContentGenerator\Module\ModuleInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -11,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="modules")
  * @ORM\HasLifecycleCallbacks
  */
-class Module
+class Module implements ModuleInterface
 {
     /**
      * @ORM\Id

@@ -20,6 +20,11 @@ abstract class BaseFixtures extends Fixture
     protected ObjectManager $manager;
 
     /**
+     * @var array
+     */
+    private array $referencesIndex = [];
+
+    /**
      * @param ObjectManager $manager
      *
      * @return void

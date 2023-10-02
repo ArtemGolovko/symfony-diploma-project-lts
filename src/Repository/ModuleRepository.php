@@ -8,6 +8,14 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Module>
+ *
+ * @method Module|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Module|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Module[]    findAll()
+ * @method Module[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ */
 class ModuleRepository extends ServiceEntityRepository
 {
     /**

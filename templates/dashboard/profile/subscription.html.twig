@@ -16,7 +16,7 @@
                         <div class="col-lg-4">
                             <div class="card mb-5 mb-lg-0">
                                 <div class="card-body">
-                                    <h5 class="card-title text-uppercase text-center {% if app.user.subscription.level == FREE %}current text-warning{% else %}text-muted{% endif %}">{% if app.user.subscription.level == FREE %}<i class="fas fa-check"></i> {% endif %}Free</h5>
+                                    <h5 class="card-title text-uppercase text-center {% if app.user.subscription.is(FREE) %}current text-warning{% else %}text-muted{% endif %}">{% if app.user.subscription.is(FREE) %}<i class="fas fa-check"></i> {% endif %}Free</h5>
                                     <h6 class="card-price text-center">$0<span class="period">/неделя</span></h6>
                                     <hr>
                                     <ul class="fa-ul">
@@ -25,7 +25,7 @@
                                         <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Продвинутые возможности генератора</li>
                                         <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Свои модули</li>
                                     </ul>
-                                    {% if app.user.subscription.level == FREE %}
+                                    {% if app.user.subscription.is(FREE) %}
                                         <a href="#" class="btn btn-block btn-secondary text-uppercase" disabled>Текущий уровень</a>
                                     {% endif %}
                                 </div>
@@ -34,7 +34,7 @@
                         <div class="col-lg-4">
                             <div class="card mb-5 mb-lg-0">
                                 <div class="card-body">
-                                    <h5 class="card-title text-uppercase text-center {% if app.user.subscription.level == PLUS %}current text-warning{% else %}text-muted{% endif %}">{% if app.user.subscription.level == PLUS %}<i class="fas fa-check"></i> {% endif %}Plus</h5>
+                                    <h5 class="card-title text-uppercase text-center {% if app.user.subscription.is(PLUS) %}current text-warning{% else %}text-muted{% endif %}">{% if app.user.subscription.is(PLUS) %}<i class="fas fa-check"></i> {% endif %}Plus</h5>
                                     <h6 class="card-price text-center">$9<span class="period">/неделя</span></h6>
                                     <hr>
                                     <ul class="fa-ul">
@@ -43,7 +43,7 @@
                                         <li><span class="fa-li"><i class="fas fa-check"></i></span>Продвинутые возможности генератора</li>
                                         <li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Свои модули</li>
                                     </ul>
-                                    {% if app.user.subscription.level == PLUS %}
+                                    {% if app.user.subscription.is(PLUS) %}
                                         <a href="#" class="btn btn-block btn-secondary text-uppercase" disabled>Текущий уровень</a>
                                     {% endif %}
                                     {% if not app.user.subscription.subordinates(PLUS) %}
@@ -55,7 +55,7 @@
                         <div class="col-lg-4">
                             <div class="card">
                                 <div class="card-body">
-                                    <h5 class="card-title text-uppercase text-center {% if app.user.subscription.level == PRO %}current text-warning{% else %}text-muted{% endif %}">{% if app.user.subscription.level == PRO %}<i class="fas fa-check"></i> {% endif %}Pro</h5>
+                                    <h5 class="card-title text-uppercase text-center {% if app.user.subscription.is(PRO) %}current text-warning{% else %}text-muted{% endif %}">{% if app.user.subscription.is(PRO) %}<i class="fas fa-check"></i> {% endif %}Pro</h5>
                                     <h6 class="card-price text-center">$49<span class="period">/неделя</span></h6>
                                     <hr>
                                     <ul class="fa-ul">
@@ -64,8 +64,8 @@
                                         <li><span class="fa-li"><i class="fas fa-check"></i></span>Продвинутые возможности генератора</li>
                                         <li><span class="fa-li"><i class="fas fa-check"></i></span>Свои модули</li>
                                     </ul>
-                                    {% if app.user.subscription.level == PRO %}
-                                        <a href="#" class="btn btn-block btn-secondary text-uppercase" dSabled>Текущий уровень</a>
+                                    {% if app.user.subscription.is(PRO) %}
+                                        <a href="#" class="btn btn-block btn-secondary text-uppercase" disabled>Текущий уровень</a>
                                     {% endif %}
                                     {% if not app.user.subscription.subordinates(PRO) %}
                                         <a href="{{ path('app_dashboard_request_subscription', { level: PRO, '_csrf': csrf_token('request') })}}" class="btn btn-block btn-primary text-uppercase">Оформить</a>

@@ -12,18 +12,18 @@ class ModuleProvider implements ModuleProviderInterface
     /**
      * @var UserModuleProvider
      */
-    private UserModuleProvider $doctrineModuleProvider;
+    private UserModuleProvider $userModuleProvider;
 
     /**
      * @param StaticModuleProvider $staticModuleProvider
-     * @param UserModuleProvider   $doctrineModuleProvider
+     * @param UserModuleProvider   $userModuleProvider
      */
     public function __construct(
         StaticModuleProvider $staticModuleProvider,
-        UserModuleProvider $doctrineModuleProvider
+        UserModuleProvider $userModuleProvider
     ) {
         $this->staticModuleProvider = $staticModuleProvider;
-        $this->doctrineModuleProvider = $doctrineModuleProvider;
+        $this->userModuleProvider = $userModuleProvider;
     }
 
     /**
@@ -33,7 +33,7 @@ class ModuleProvider implements ModuleProviderInterface
     {
         return array_merge(
             $this->staticModuleProvider->getModules(),
-            $this->doctrineModuleProvider->getModules()
+            $this->userModuleProvider->getModules()
         );
     }
 }

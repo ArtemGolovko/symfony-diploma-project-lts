@@ -3,31 +3,31 @@
 namespace App\EventListener;
 
 use App\Event\RegistrationSuccessEvent;
-use App\Service\RedirectService;
-use App\Service\Verification\VerifyEmailService;
+use App\Service\Redirect;
+use App\Service\Verification\VerifyEmail;
 
 class RegistrationSuccessListener
 {
     /**
-     * @var VerifyEmailService
+     * @var VerifyEmail
      */
-    private VerifyEmailService $verifyEmail;
+    private VerifyEmail $verifyEmail;
 
     /**
-     * @var RedirectService
+     * @var Redirect
      */
-    private RedirectService $redirectService;
+    private Redirect $redirect;
 
     /**
-     * @param VerifyEmailService $verifyEmail
-     * @param RedirectService    $redirectService
+     * @param VerifyEmail $verifyEmail
+     * @param Redirect    $redirect
      */
     public function __construct(
-        VerifyEmailService $verifyEmail,
-        RedirectService $redirectService
+        VerifyEmail $verifyEmail,
+        Redirect $redirect
     ) {
         $this->verifyEmail = $verifyEmail;
-        $this->redirectService = $redirectService;
+        $this->redirect = $redirect;
     }
 
     /**
@@ -42,7 +42,7 @@ class RegistrationSuccessListener
 
         $session = $event->getRequest()->getSession();
 
-        $this->redirectService->setRedirectPathToRoute('app_register');
+        $this->redirect->setRedirectPathToRoute('app_register');
         $session->getFlashBag()->add('success', 'Для завершения регистрации подтвердите ваш email');
     }
 }
