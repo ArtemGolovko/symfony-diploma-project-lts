@@ -6,8 +6,6 @@
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
-/public/vendor/*
-!/public/vendor/.gitkeep
 /var/
 /vendor/
 /layout/
