@@ -1,0 +1,20 @@
+services:
+  db:
+    image: mysql:5.7.44
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - ${DB_PORT}:3306
+    volumes:
+      - ./volumes/db:/var/lib/mysql
+
+  app:
+    build: ./docker/app
+    ports:
+      - ${APP_PORT}:8000
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+
