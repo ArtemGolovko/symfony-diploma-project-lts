@@ -11,4 +11,5 @@
 /layout/
 ###< symfony/framework-bundle ###
 
-
+/volumes
+/.docker/mysql/db
