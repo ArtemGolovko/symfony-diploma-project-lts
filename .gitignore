@@ -13,3 +13,4 @@
 
 /volumes
 /.docker/mysql/db
+/.docker/mailpit/db

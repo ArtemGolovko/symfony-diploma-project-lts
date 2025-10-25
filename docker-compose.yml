@@ -21,7 +21,7 @@ services:
 
       - .:/var/www/html
     ports:
-      - "9000:9000"
+      - ":9000"
     depends_on:
       - mysql
     networks:
@@ -38,6 +38,20 @@ services:
       - 3306:3306
     volumes:
       - ./.docker/mysql/db:/var/lib/mysql
+    networks:
+      - app-network
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - 8025:8025 # web ui
+      - 1025:1025 # smtp
+    volumes:
+      - ./.docker/mailpit/db:/data
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
     networks:
       - app-network
 

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+chown -R www-data:www-data /var/www/html/public
+
 if [ ! -z "$UID" ]; then
     usermod -u $UID dev
 fi
